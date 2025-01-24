@@ -5,8 +5,8 @@
 #                                                     +:+ +:+         +:+      #
 #    By: hubourge <hubourge@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2023/10/31 14:29:47 by hubourge          #+#    #+#              #
-#    Updated: 2025/01/22 16:31:14 by hubourge         ###   ########.fr        #
+#    Created: 2025/01/24 14:34:48 by hubourge          #+#    #+#              #
+#    Updated: 2025/01/24 17:16:33 by hubourge         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -23,7 +23,9 @@ LIBFT		= $(LIBFT_DIR)/libft.a
 
 OBJ_DIR		= obj
 
-SRC			= srcs/main.c \
+SRC			=	srcs/main.c \
+				srcs/utils.c \
+				srcs/elf_parser.c \
 				
 OBJ			= $(addprefix $(OBJ_DIR)/, $(SRC:.c=.o))
 
@@ -33,7 +35,7 @@ NC			=\033[0m
 
 all: $(LIBFT)  $(OBJ) 
 	@ echo "$(YELLOW)Compiling ft_nm...$(NC)"
-	@ $(CXX) $(CFLAGS) ${INCLUDE} -o $(NAME) $(OBJ) 
+	@ $(CXX) $(CFLAGS) ${INCLUDE} -o $(NAME) $(OBJ) -L $(LIBFT_DIR) -lft
 	@ echo "$(BIBlue)"
 	@ echo "   __ _                       "
 	@ echo "  / _| |_     _ __  _ __ ___  "
