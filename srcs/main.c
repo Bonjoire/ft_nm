@@ -14,6 +14,7 @@
 
 int main(int ac, char **av)
 {
+	printf("===== MAIN =====\n");
 	t_data data;
 
 	if(ac != 2)
@@ -21,15 +22,15 @@ int main(int ac, char **av)
 		ft_putstr_fd("Usage: ./malloc [file]\n", 2);
 		return(EXIT_FAILURE);
 	}
-
 	
 	map_file(&data, av[1]);
-	if (!is_valid_efl(data.mapped_file))
-		return(EXIT_FAILURE);
+	if (detect_valid_elf(&data, data.mapped_file) == 0)
+		free_all_exit(data, EXIT_FAILURE);
 	
 
+	printf("=== END MAIN ===\n");
 	show_stat(data.statbuf);
-	show_elf((Elf64_Ehdr *)data.mapped_file);
+	show_elf64((Elf64_Ehdr *)data.mapped_file);
 
 	return(EXIT_SUCCESS);
 }

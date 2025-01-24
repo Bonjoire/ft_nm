@@ -12,9 +12,19 @@
 
 #include "nm.h"
 
+void    free_all_exit(t_data data, int exit_status)
+{
+    if (data.mapped_file)
+        munmap(data.mapped_file, data.statbuf.st_size);
+    if (data.fd != -1)
+        close(data.fd);
+    if (exit_status == EXIT_FAILURE)
+        exit(EXIT_FAILURE);
+}
+
 void	show_stat(struct stat statbuf)
 {
-	printf("=========== SHOW STAT ===========\n");
+	printf("\n=========== SHOW STAT ===========\n");
 
 	
     printf("Device ID:                     %ld\n", (long)statbuf.st_dev);
@@ -36,9 +46,9 @@ void	show_stat(struct stat statbuf)
 	printf("=================================\n");
 }
 
-void show_elf(Elf64_Ehdr *header)
+void show_elf64(Elf64_Ehdr *header)
 {
-	printf("======== SHOW ELF HEADER ========\n");
+	printf("\n======== SHOW ELF HEADER ========\n");
 	
     printf("Magic:   ");
     for (int i = 0; i < EI_NIDENT; i++) {
@@ -61,4 +71,36 @@ void show_elf(Elf64_Ehdr *header)
     printf("Section header string table index: %u\n", header->e_shstrndx);
 
 	printf("================================\n");
+}
+
+void    show_section64(Elf64_Shdr *section)
+{
+    printf("\n======== SHOW SECTION HEADER =======\n");
+
+    printf("Name:                            %u\n", section->sh_name);
+    printf("Type:                            %u\n", section->sh_type);
+    printf("Flags:                           %lu\n", section->sh_flags);
+    printf("Address:                         %lu\n", section->sh_addr);
+    printf("Offset:                          %lu\n", section->sh_offset);
+    printf("Size:                            %lu\n", section->sh_size);
+    printf("Link:                            %u\n", section->sh_link);
+    printf("Info:                            %u\n", section->sh_info);
+    printf("Address alignment:               %lu\n", section->sh_addralign);
+    printf("Entry size:                      %lu\n", section->sh_entsize);
+
+    printf("====================================\n");
+}
+
+void    show_symbol64(Elf64_Sym *symbol)
+{
+    printf("\n======== SHOW SYMBOL =======\n");
+
+    printf("Name:                            %u\n", symbol->st_name);
+    printf("Info:                            %u\n", symbol->st_info);
+    printf("Other:                           %u\n", symbol->st_other);
+    printf("Section index:                   %u\n", symbol->st_shndx);
+    printf("Value:                           %lu\n", symbol->st_value);
+    printf("Size:                            %lu\n", symbol->st_size);
+
+    printf("=============================\n");
 }

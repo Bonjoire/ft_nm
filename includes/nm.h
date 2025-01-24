@@ -35,10 +35,14 @@ typedef struct s_data
 
 // elf_parser.c
 void	*map_file(t_data *data, char *file);
-int		is_valid_efl(void *mapped_file);
+int		detect_valid_elf(t_data *data, void *mapped_file);
+void	handle_64(t_data *data);
 
 // utils.c
+void    free_all_exit(t_data data, int exit_status);
 void	show_stat(struct stat statbuf);
-void	show_elf(Elf64_Ehdr *header);
+void	show_elf64(Elf64_Ehdr *header);
+void    show_section64(Elf64_Shdr *section);
+void    show_symbol64(Elf64_Sym *symbol);
 
 #endif
