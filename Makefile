@@ -60,7 +60,7 @@ clean:
 	@ echo "$(YELLOW)Cleaning completed$(NC)\n"
 
 fclean: clean
-	@ rm -rf libft_malloc.so libft_malloc_$(HOSTTYPE).so a.out
+	@ rm -rf $(NAME)
 	@ make -sC $(LIBFT_DIR) fclean
 
 re: fclean all
