@@ -26,7 +26,6 @@ void	show_stat(struct stat statbuf)
 {
 	printf("\n=========== SHOW STAT ===========\n");
 
-	
     printf("Device ID:                     %ld\n", (long)statbuf.st_dev);
     printf("Inode number:                  %ld\n", (long)statbuf.st_ino);
     printf("File type and mode:            %o\n", statbuf.st_mode);

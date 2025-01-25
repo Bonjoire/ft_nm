@@ -25,7 +25,8 @@ OBJ_DIR		= obj
 
 SRC			=	srcs/main.c \
 				srcs/utils.c \
-				srcs/elf_parser.c \
+				srcs/parse_elf.c \
+				srcs/parse_symbol.c \
 				
 OBJ			= $(addprefix $(OBJ_DIR)/, $(SRC:.c=.o))
 

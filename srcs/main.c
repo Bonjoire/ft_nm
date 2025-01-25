@@ -26,7 +26,6 @@ int main(int ac, char **av)
 	map_file(&data, av[1]);
 	if (detect_valid_elf(&data, data.mapped_file) == 0)
 		free_all_exit(data, EXIT_FAILURE);
-	
 
 	printf("=== END MAIN ===\n");
 	show_stat(data.statbuf);

@@ -37,6 +37,10 @@ typedef struct s_data
 void	*map_file(t_data *data, char *file);
 int		detect_valid_elf(t_data *data, void *mapped_file);
 void	handle_64(t_data *data);
+// void parse_symbols64(t_data *data, Elf64_Sym *symtab, Elf64_Shdr *strtab_section);
+void parse_symbols64(t_data *data, Elf64_Shdr *symtab_section, Elf64_Shdr *strtab_section);
+
+
 
 // utils.c
 void    free_all_exit(t_data data, int exit_status);

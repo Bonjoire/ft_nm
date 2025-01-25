@@ -129,52 +129,37 @@ void	handle_64(t_data *data)
 	Elf64_Ehdr *header = (Elf64_Ehdr *)data->mapped_file;
 	Elf64_Shdr *section = (Elf64_Shdr *)((char *)data->mapped_file + header->e_shoff);
 
-	// Table of section names
+	// Table of section
 	Elf64_Shdr *section_tab_header = &section[header->e_shstrndx];
 	const char *section_tab = (const char *)data->mapped_file + section_tab_header->sh_offset;
 
 	// Parse sections symbols;
-	int found_symtab = 0;
-    int found_strtab = 0;
-    int found_text = 0;
-    int found_data = 0;
-    int found_bss = 0;
+	Elf64_Shdr *symtab_section = NULL;
+    Elf64_Shdr *strtab_section = NULL;
 
 	for (uint16_t i = 0; i < header->e_shnum; i++)
 	{
-        const char *section_name = &section_tab[section[i].sh_name];
-		
-        if (!found_symtab && strcmp(section_name, ".symtab") == 0)
+		const char *section_name = &section_tab[section[i].sh_name];
+
+		if (!symtab_section && strcmp(section_name, ".symtab") == 0)
 		{
-            printf("Section: .symtab\n");
-            found_symtab = 1;
-        }
-		else if (!found_strtab && strcmp(section_name, ".strtab") == 0)
+			printf("Section: .symtab\n");
+			symtab_section = &section[i];
+		}
+		else if (!strtab_section && strcmp(section_name, ".strtab") == 0)
 		{
-            printf("Section: .strtab\n");
-            found_strtab = 1;
-        }
-		else if (!found_text && strcmp(section_name, ".text") == 0)
-		{
-            printf("Section: .text\n");
-            found_text = 1;
-        }
-		else if (!found_data && strcmp(section_name, ".data") == 0)
-		{
-            printf("Section: .data\n");
-            found_data = 1;
-        }
-		else if (!found_bss && strcmp(section_name, ".bss") == 0)
-		{
-            printf("Section: .bss\n");
-            found_bss = 1;
-        }
+			printf("Section: .strtab\n");
+			strtab_section = &section[i];
+		}
+		if (symtab_section && strtab_section)
+			break;
 	}
 
-	if (!(found_symtab && found_strtab && found_text && found_data && found_bss))
+	if (symtab_section && strtab_section)
+		parse_symbols64(data, symtab_section, strtab_section);
+	else
 	{
-		ft_putstr_fd("Invalid ELF file\n", STDERR_FILENO);
+		ft_putstr_fd("Invalid ELF file: Missing .symtab or .strtab\n", STDERR_FILENO);
 		free_all_exit(*data, EXIT_FAILURE);
 	}
-	
 }
