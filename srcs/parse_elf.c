@@ -126,31 +126,27 @@ int	detect_valid_elf(t_data *data, void *mapped_file)
 void	handle_64(t_data *data)
 {
 	// ELF Header and Section Header
-	Elf64_Ehdr *header = (Elf64_Ehdr *)data->mapped_file;
-	Elf64_Shdr *section = (Elf64_Shdr *)((char *)data->mapped_file + header->e_shoff);
+	Elf64_Ehdr	*header		= (Elf64_Ehdr *)data->mapped_file;
+	Elf64_Shdr	*section	= (Elf64_Shdr *)((char *)data->mapped_file + header->e_shoff);
+	uint16_t	nb_sections	= header->e_shnum;
 
 	// Table of section
-	Elf64_Shdr *section_tab_header = &section[header->e_shstrndx];
-	const char *section_tab = (const char *)data->mapped_file + section_tab_header->sh_offset;
+	Elf64_Shdr	*section_tab_header	= &section[header->e_shstrndx];
+	const char	*section_tab		= (const char *)data->mapped_file + section_tab_header->sh_offset;
 
 	// Parse sections symbols;
-	Elf64_Shdr *symtab_section = NULL;
-    Elf64_Shdr *strtab_section = NULL;
+	Elf64_Shdr	*symtab_section	= NULL;
+    Elf64_Shdr	*strtab_section	= NULL;
 
-	for (uint16_t i = 0; i < header->e_shnum; i++)
+	// Find .symtab and .strtab sections
+	for (uint16_t i = 0; i < nb_sections; i++)
 	{
-		const char *section_name = &section_tab[section[i].sh_name];
+		const char	*section_name = &section_tab[section[i].sh_name];
 
 		if (!symtab_section && strcmp(section_name, ".symtab") == 0)
-		{
-			printf("Section: .symtab\n");
 			symtab_section = &section[i];
-		}
 		else if (!strtab_section && strcmp(section_name, ".strtab") == 0)
-		{
-			printf("Section: .strtab\n");
 			strtab_section = &section[i];
-		}
 		if (symtab_section && strtab_section)
 			break;
 	}

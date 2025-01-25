@@ -12,7 +12,7 @@
 
 #include "nm.h"
 
-int main(int ac, char **av)
+int	main(int ac, char **av)
 {
 	printf("===== MAIN =====\n");
 	t_data data;
@@ -28,10 +28,9 @@ int main(int ac, char **av)
 		free_all_exit(data, EXIT_FAILURE);
 
 	printf("=== END MAIN ===\n");
-	show_stat(data.statbuf);
-	show_elf64((Elf64_Ehdr *)data.mapped_file);
+	// show_stat(data.statbuf);
+	// show_elf64((Elf64_Ehdr *)data.mapped_file);
 
 	return(EXIT_SUCCESS);
 }
-
 
