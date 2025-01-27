@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   nm.h                                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hubourge <hubourge@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 14:34:54 by hubourge          #+#    #+#             */
-/*   Updated: 2025/01/24 17:40:46 by hubourge         ###   ########.fr       */
+/*   Updated: 2025/01/27 15:53:33 by hubourge         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,16 +31,25 @@ typedef struct s_data
 	int			fd;
 	void		*mapped_file;
 	struct stat	statbuf;
-}           t_data;
+	Elf64_Ehdr	*header;
+}				t_data;
+
+typedef struct s_symbol {
+	Elf64_Sym		*symbol;
+	char			*name;
+	char			type;
+	unsigned long	address;
+}				t_symbol;
 
 // elf_parser.c
 void	*map_file(t_data *data, char *file);
 int		detect_valid_elf(t_data *data, void *mapped_file);
 void	handle_64(t_data *data);
-void	parse_symbols64(t_data *data, Elf64_Shdr *symtab_section, Elf64_Shdr *strtab_section);
-void	get_set_symbol(char *symbol_type, uint8_t type, uint8_t bind, uint16_t symbol_index, t_data *data);
 
-
+// parse_symbol.c
+void	parse_symbols64(t_data *data, Elf64_Shdr *symtab_section, Elf64_Shdr *strtab_section, Elf64_Shdr *section_header);
+void	get_set_symbol_type(char *symbol_type, uint8_t type, uint8_t bind, uint16_t symbol_index, Elf64_Shdr *section_header);
+void	sort_symbols(t_symbol *symbols, size_t count);
 
 // utils.c
 void    free_all_exit(t_data data, int exit_status);

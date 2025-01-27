@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   elf_parser.c                                       :+:      :+:    :+:   */
+/*   parse_elf.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hubourge <hubourge@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 17:10:51 by hubourge          #+#    #+#             */
-/*   Updated: 2025/01/24 18:11:42 by hubourge         ###   ########.fr       */
+/*   Updated: 2025/01/27 11:41:55 by hubourge         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,6 @@ int	detect_valid_elf(t_data *data, void *mapped_file)
 	// Detect 32 or 64 bits ELF file
 	if (e_ident[EI_CLASS] == ELFCLASS64)
 	{
-        printf("ELF Class: 64-bit\n");
 		handle_64(data);
 	}
 	else if(e_ident[EI_CLASS] == ELFCLASS32)
@@ -127,11 +126,12 @@ void	handle_64(t_data *data)
 {
 	// ELF Header and Section Header
 	Elf64_Ehdr	*header		= (Elf64_Ehdr *)data->mapped_file;
-	Elf64_Shdr	*section	= (Elf64_Shdr *)((char *)data->mapped_file + header->e_shoff);
+	Elf64_Shdr	*section_header	= (Elf64_Shdr *)((char *)data->mapped_file + header->e_shoff);
 	uint16_t	nb_sections	= header->e_shnum;
+	data->header = header;
 
-	// Table of section
-	Elf64_Shdr	*section_tab_header	= &section[header->e_shstrndx];
+	// Table of section_header
+	Elf64_Shdr	*section_tab_header	= &section_header[header->e_shstrndx];
 	const char	*section_tab		= (const char *)data->mapped_file + section_tab_header->sh_offset;
 
 	// Parse sections symbols;
@@ -141,18 +141,18 @@ void	handle_64(t_data *data)
 	// Find .symtab and .strtab sections
 	for (uint16_t i = 0; i < nb_sections; i++)
 	{
-		const char	*section_name = &section_tab[section[i].sh_name];
+		const char	*section_name = &section_tab[section_header[i].sh_name];
 
 		if (!symtab_section && strcmp(section_name, ".symtab") == 0)
-			symtab_section = &section[i];
+			symtab_section = &section_header[i];
 		else if (!strtab_section && strcmp(section_name, ".strtab") == 0)
-			strtab_section = &section[i];
+			strtab_section = &section_header[i];
 		if (symtab_section && strtab_section)
 			break;
 	}
 
 	if (symtab_section && strtab_section)
-		parse_symbols64(data, symtab_section, strtab_section);
+		parse_symbols64(data, symtab_section, strtab_section, section_header);
 	else
 	{
 		ft_putstr_fd("Invalid ELF file: Missing .symtab or .strtab\n", STDERR_FILENO);
