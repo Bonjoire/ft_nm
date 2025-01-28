@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hubourge <hubourge@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 14:34:27 by hubourge          #+#    #+#             */
-/*   Updated: 2025/01/24 17:43:25 by hubourge         ###   ########.fr       */
+/*   Updated: 2025/01/28 14:55:42 by hubourge         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,27 @@ void    free_all_exit(t_data data, int exit_status)
     if (exit_status == EXIT_FAILURE)
         exit(EXIT_FAILURE);
 }
+
+void sort_symbols(t_symbol *symbols, size_t count)
+{
+	for (size_t i = 0; i < count - 1; i++)
+	{
+		for (size_t j = 0; j < count - i - 1; j++)
+		{
+			int	cmp_result	= strcmp(symbols[j].name, symbols[j + 1].name);
+			int	cmp_addr	= symbols[j].address > symbols[j + 1].address;
+
+			// Sort fisrt by name, then by address
+			if (cmp_result > 0 || (cmp_result == 0 && cmp_addr))
+			{
+				t_symbol temp = symbols[j];
+				symbols[j] = symbols[j + 1];
+				symbols[j + 1] = temp;
+			}
+		}
+	}
+}
+
 
 void	show_stat(struct stat statbuf)
 {

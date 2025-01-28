@@ -6,7 +6,7 @@
 /*   By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 14:34:34 by hubourge          #+#    #+#             */
-/*   Updated: 2025/01/27 11:14:39 by hubourge         ###   ########.fr       */
+/*   Updated: 2025/01/28 17:43:01 by hubourge         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,9 +26,6 @@ int	main(int ac, char **av)
 	if (detect_valid_elf(&data, data.mapped_file) == 0)
 		free_all_exit(data, EXIT_FAILURE);
 
-	// show_stat(data.statbuf);
-	// show_elf64((Elf64_Ehdr *)data.mapped_file);
-
+	
 	return(EXIT_SUCCESS);
 }
-

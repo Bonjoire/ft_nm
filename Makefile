@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: hubourge <hubourge@student.42.fr>          +#+  +:+       +#+         #
+#    By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/01/24 14:34:48 by hubourge          #+#    #+#              #
-#    Updated: 2025/01/24 17:16:33 by hubourge         ###   ########.fr        #
+#    Updated: 2025/01/28 17:19:44 by hubourge         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -30,7 +30,7 @@ SRC			=	srcs/main.c \
 				
 OBJ			= $(addprefix $(OBJ_DIR)/, $(SRC:.c=.o))
 
-YELLOW		=\033[0;33m
+YELLOW		=\033[0;33mcd
 BIBlue		=\033[1;94m
 NC			=\033[0m
 
