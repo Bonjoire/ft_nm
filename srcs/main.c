@@ -6,7 +6,7 @@
 /*   By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 14:34:34 by hubourge          #+#    #+#             */
-/*   Updated: 2025/01/28 17:43:01 by hubourge         ###   ########.fr       */
+/*   Updated: 2025/01/29 11:14:27 by hubourge         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,18 +14,13 @@
 
 int	main(int ac, char **av)
 {
-	t_data data;
-
-	if(ac != 2)
-	{
-		ft_putstr_fd("Usage: ./malloc [file]\n", 2);
-		return(EXIT_FAILURE);
-	}
+	t_data	data;
 	
-	map_file(&data, av[1]);
-	if (detect_valid_elf(&data, data.mapped_file) == 0)
-		free_all_exit(data, EXIT_FAILURE);
-
+	parsing(ac, av, &data);
 	
+	// map_file(&data, av[1]);
+	// if (detect_valid_elf(&data, data.mapped_file) == 0)
+	// 	free_all_exit(data, EXIT_FAILURE);
+
 	return(EXIT_SUCCESS);
 }

@@ -6,7 +6,7 @@
 #    By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/01/24 14:34:48 by hubourge          #+#    #+#              #
-#    Updated: 2025/01/28 17:19:44 by hubourge         ###   ########.fr        #
+#    Updated: 2025/01/29 11:14:13 by hubourge         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -25,6 +25,7 @@ OBJ_DIR		= obj
 
 SRC			=	srcs/main.c \
 				srcs/utils.c \
+				srcs/parsing.c \
 				srcs/parse_elf.c \
 				srcs/parse_symbol.c \
 				

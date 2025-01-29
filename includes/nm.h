@@ -6,7 +6,7 @@
 /*   By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 14:34:54 by hubourge          #+#    #+#             */
-/*   Updated: 2025/01/28 14:57:16 by hubourge         ###   ########.fr       */
+/*   Updated: 2025/01/29 11:15:24 by hubourge         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,10 @@ void	parse_symbols64(t_data *data, Elf64_Shdr *symtab_section, Elf64_Shdr *strta
 void	parse_symbols32(t_data *data, Elf32_Shdr *symtab_section, Elf32_Shdr *strtab_section, Elf32_Shdr *section_header);
 void	get_set_symbol_type64(char *symbol_type, uint8_t type, uint8_t bind, uint16_t symbol_index, Elf64_Shdr *section_header);
 void	get_set_symbol_type32(char *symbol_type, uint8_t type, uint8_t bind, uint16_t symbol_index, Elf32_Shdr *section_header);
+
+// parsing.c
+void	parsing(int ac, char **av, t_data *data);
+void	print_help(void);
 
 // utils.c
 void    free_all_exit(t_data data, int exit_status);
