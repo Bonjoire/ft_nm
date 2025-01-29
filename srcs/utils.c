@@ -6,11 +6,26 @@
 /*   By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 14:34:27 by hubourge          #+#    #+#             */
-/*   Updated: 2025/01/28 14:55:42 by hubourge         ###   ########.fr       */
+/*   Updated: 2025/01/29 19:50:04 by hubourge         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "nm.h"
+
+void    init_data(t_data *data)
+{
+    data->fd = -1;
+    data->mapped_file = NULL;
+    data->header64 = NULL;
+    data->header32 = NULL;
+    data->files = NULL;
+    data->opt_a = 0;
+    data->opt_g = 0;
+    data->opt_u = 0;
+    data->opt_r = 0;
+    data->opt_p = 0;
+    data->opt_h = 0;
+}
 
 void    free_all_exit(t_data data, int exit_status)
 {
@@ -18,6 +33,12 @@ void    free_all_exit(t_data data, int exit_status)
         munmap(data.mapped_file, data.statbuf.st_size);
     if (data.fd != -1)
         close(data.fd);
+    if (data.files)
+    {
+        for (int i = 0; data.files[i]; i++)
+            free(data.files[i]);
+        free(data.files);
+    }
     if (exit_status == EXIT_FAILURE)
         exit(EXIT_FAILURE);
 }

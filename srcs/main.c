@@ -6,7 +6,7 @@
 /*   By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 14:34:34 by hubourge          #+#    #+#             */
-/*   Updated: 2025/01/29 11:14:27 by hubourge         ###   ########.fr       */
+/*   Updated: 2025/01/29 17:23:24 by hubourge         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@ int	main(int ac, char **av)
 {
 	t_data	data;
 	
+	init_data(&data);
 	parsing(ac, av, &data);
 	
 	// map_file(&data, av[1]);
