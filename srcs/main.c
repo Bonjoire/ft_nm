@@ -6,7 +6,7 @@
 /*   By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 14:34:34 by hubourge          #+#    #+#             */
-/*   Updated: 2025/01/29 17:23:24 by hubourge         ###   ########.fr       */
+/*   Updated: 2025/01/30 17:54:33 by hubourge         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,13 +15,31 @@
 int	main(int ac, char **av)
 {
 	t_data	data;
+	(void)ac;
+
+	init_data(&data, DO_INIT_OPT);
+	parsing(&data, av);
 	
-	init_data(&data);
-	parsing(ac, av, &data);
-	
-	// map_file(&data, av[1]);
-	// if (detect_valid_elf(&data, data.mapped_file) == 0)
-	// 	free_all_exit(data, EXIT_FAILURE);
+	int i = 1;
+	while (av[i])
+	{
+		if (av[i][0] != '-')
+		{
+			init_data(&data, DO_NOT_INIT_OPT);
+			
+			if (data.nb_files > 1)
+			{
+				ft_putstr_fd("\n", 1);
+				ft_putstr_fd(av[i], 1);
+				ft_putstr_fd(":\n", 1);
+			}
+			
+			map_file(&data, av[i]);
+			detect_valid_elf(&data, data.mapped_file);
+			free_all_exit(data, DO_NOT_EXIT);
+		}
+		i++;
+	}
 
 	return(EXIT_SUCCESS);
 }

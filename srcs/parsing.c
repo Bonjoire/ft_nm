@@ -6,43 +6,42 @@
 /*   By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/29 11:14:29 by hubourge          #+#    #+#             */
-/*   Updated: 2025/01/29 20:15:39 by hubourge         ###   ########.fr       */
+/*   Updated: 2025/01/30 17:33:31 by hubourge         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "nm.h"
 
-void	print_help(void)
+void	parsing(t_data *data, char **av)
 {
-	ft_putstr_fd("Usage: ./ft_nm [option(s)] [file(s)]\n", 2);
-	ft_putstr_fd("	List symbols in [file(s)] (a.out by default).\n", 2);
-	ft_putstr_fd("	The options are:\n", 2);
-	ft_putstr_fd(" 		-h, --help\tDisplay this information\n", 2);
-	ft_putstr_fd("		-a, --debug-syms       Display debugger-only symbols\n", 2);
-	ft_putstr_fd("		-g, --extern-only      Display only external symbols\n", 2);
-	ft_putstr_fd("		-u, --undefined-only   Display only undefined symbols\n", 2);
-	ft_putstr_fd("		-r, --reverse-sort     Reverse the sense of the sort\n", 2);
-	ft_putstr_fd("		-p, --no-sort          Do not sort the symbols\n", 2);
-}
+	int i;
 
-int	find_str_set_option(char *str, char *to_find, int *opt, int value)
-{
-	if (ft_strncmp(str, to_find, ft_strlen(to_find) + 1) == 0)
+	// Parse options
+	i = 1;
+	while (av[i])
 	{
-		*opt = value;
-		return (1);
+		if (av[i][0] == '-')
+		{
+			if (is_option_set(data, av[i]) == 0)
+			{
+				ft_putstr_fd("ft_nm: unrecognized option ", 2);
+				ft_putstr_fd(av[i], 2);
+				ft_putstr_fd("\n", 2);
+				print_help();
+				exit(EXIT_FAILURE);
+			}
+		}
+		else
+			data->nb_files++;
+		i++;
 	}
-	return (0);
-}
-
-int	find_char_set_option(char c, char to_find, int *opt, int value)
-{
-	if (c == to_find)
+	
+	// Parse -h option
+	if (data->opt_h == 1)
 	{
-		*opt = value;
-		return (1);
+		print_help();
+		exit(EXIT_SUCCESS);
 	}
-	return (0);
 }
 
 int	is_option_set(t_data *data, char *str)
@@ -81,37 +80,35 @@ int	is_option_set(t_data *data, char *str)
 	return (0);
 }
 
-void	parsing(int ac, char **av, t_data *data)
+int	find_str_set_option(char *str, char *to_find, int *opt, int value)
 {
-	(void)ac;
-	(void)av;
-	(void)data;
-	int i;
-
-	// Parse options
-	i = 1;
-	while (av[i])
+	if (ft_strncmp(str, to_find, ft_strlen(to_find) + 1) == 0)
 	{
-		if (av[i][0] == '-')
-		{
-			if (is_option_set(data, av[i]) == 0)
-			{
-				ft_putstr_fd("ft_nm: unrecognized option ", 2);
-				ft_putstr_fd(av[i], 2);
-				ft_putstr_fd("\n", 2);
-				print_help();
-				exit(EXIT_FAILURE);
-			}
-		}
-		i++;
+		*opt = value;
+		return (1);
 	}
-	
-	// Parse -h option
-	if (data->opt_h == 1)
-	{
-		print_help();
-		exit(EXIT_SUCCESS);
-	}
+	return (0);
+}
 
-	// Parse files	
+int	find_char_set_option(char c, char to_find, int *opt, int value)
+{
+	if (c == to_find)
+	{
+		*opt = value;
+		return (1);
+	}
+	return (0);
+}
+
+void	print_help(void)
+{
+	ft_putstr_fd("Usage: ./ft_nm [option(s)] [file(s)]\n", 2);
+	ft_putstr_fd("	List symbols in [file(s)] (a.out by default).\n", 2);
+	ft_putstr_fd("	The options are:\n", 2);
+	ft_putstr_fd(" 		-h, --help\tDisplay this information\n", 2);
+	ft_putstr_fd("		-a, --debug-syms       Display debugger-only symbols\n", 2);
+	ft_putstr_fd("		-g, --extern-only      Display only external symbols\n", 2);
+	ft_putstr_fd("		-u, --undefined-only   Display only undefined symbols\n", 2);
+	ft_putstr_fd("		-r, --reverse-sort     Reverse the sense of the sort\n", 2);
+	ft_putstr_fd("		-p, --no-sort          Do not sort the symbols\n", 2);
 }

@@ -6,7 +6,7 @@
 /*   By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 14:34:54 by hubourge          #+#    #+#             */
-/*   Updated: 2025/01/29 19:16:40 by hubourge         ###   ########.fr       */
+/*   Updated: 2025/01/31 11:28:18 by hubourge         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,12 @@
 # include <string.h>
 # include <time.h>
 
+# define DO_NOT_INIT_OPT 0
+# define DO_INIT_OPT 1
+# define DO_NOT_EXIT 0
+# define UNDEF 1
+# define NOT_UNDEF 0
+
 typedef struct s_data
 {
 	int			fd;
@@ -33,7 +39,7 @@ typedef struct s_data
 	struct stat	statbuf;
 	Elf64_Ehdr	*header64;
 	Elf32_Ehdr	*header32;
-	char		**files;
+	size_t		nb_files;
 	int			opt_a;
 	int			opt_g;
 	int			opt_u;
@@ -52,7 +58,7 @@ typedef struct s_symbol {
 
 // elf_parser.c
 void	*map_file(t_data *data, char *file);
-int		detect_valid_elf(t_data *data, void *mapped_file);
+void	detect_valid_elf(t_data *data, void *mapped_file);
 void	handle64(t_data *data);
 void	handle32(t_data *data);
 
@@ -63,16 +69,17 @@ void	get_set_symbol_type64(char *symbol_type, uint8_t type, uint8_t bind, uint16
 void	get_set_symbol_type32(char *symbol_type, uint8_t type, uint8_t bind, uint16_t symbol_index, Elf32_Shdr *section_header);
 
 // parsing.c
-void	parsing(int ac, char **av, t_data *data);
+void	parsing(t_data *data, char **av);
 int		find_str_set_option(char *str, char *to_find, int *opt, int value);
 int		find_char_set_option(char c, char to_find, int *opt, int value);
 int		is_option_set(t_data *data, char *str);
 void	print_help(void);
 
 // utils.c
-void	init_data(t_data *data);
+void	init_data(t_data *data, int ipt_status);
 void    free_all_exit(t_data data, int exit_status);
 void	sort_symbols(t_symbol *symbols, size_t count);
+void	print_values(int size, int is_undef, long unsigned int address, char type, char *name);
 void	show_stat(struct stat statbuf);
 void	show_elf64(Elf64_Ehdr *header);
 void    show_section64(Elf64_Shdr *section);

@@ -66,10 +66,11 @@ void	parse_symbols64(t_data *data, Elf64_Shdr *symtab_section, Elf64_Shdr *strta
 	for (size_t i = 0; i < symbol_count; i++)
 	{
 		if (symbols[i].symbol64->st_shndx == SHN_UNDEF)	// Undefined symbol
-			printf("%16c %c %s\n", ' ', symbols[i].type, symbols[i].name);
-		else												// Defined symbol
-			printf("%016lx %c %s\n", symbols[i].address, symbols[i].type, symbols[i].name);
+			print_values(16, UNDEF, 0, symbols[i].type, symbols[i].name);
+		else											// Defined symbol
+			print_values(16, NOT_UNDEF, symbols[i].address, symbols[i].type, symbols[i].name);
 	}
+
 	free(symbols);
 }
 
@@ -118,7 +119,7 @@ void	parse_symbols32(t_data *data, Elf32_Shdr *symtab_section, Elf32_Shdr *strta
 		get_set_symbol_type32(&symbol_type, type, bind, symbol_index, section_header);
 		symbols[symbol_count].name = symbol_name;
 		symbols[symbol_count].type = symbol_type;
-		symbols[symbol_count].address = symbol_addr;
+		symbols[symbol_count].address = symbol_addr + 100000;
 		symbols[symbol_count].symbol32 = symbol;
 		symbol_count++;
 	}
@@ -127,9 +128,9 @@ void	parse_symbols32(t_data *data, Elf32_Shdr *symtab_section, Elf32_Shdr *strta
 	for (size_t i = 0; i < symbol_count; i++)
 	{
 		if (symbols[i].symbol32->st_shndx == SHN_UNDEF)	// Undefined symbol
-			printf("%8c %c %s\n", ' ', symbols[i].type, symbols[i].name);
-		else												// Defined symbol
-			printf("%08lx %c %s\n", symbols[i].address, symbols[i].type, symbols[i].name);
+			print_values(8, UNDEF, 0, symbols[i].type, symbols[i].name);
+		else											// Defined symbol
+			print_values(8, NOT_UNDEF, symbols[i].address, symbols[i].type, symbols[i].name);
 	}
 	free(symbols);
 }

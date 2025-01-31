@@ -6,7 +6,7 @@
 /*   By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/31 16:54:17 by hubourge          #+#    #+#             */
-/*   Updated: 2025/01/03 15:30:38 by hubourge         ###   ########.fr       */
+/*   Updated: 2025/01/31 16:52:40 by hubourge         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,5 +68,6 @@ void	ft_lstclear(t_list **lst, void (*del)(void *));
 void	ft_lstiter(t_list *lst, void (*f)(void *));
 t_list	*ft_lstmap(t_list *lst, void *(*f)(void *), void (*del)(void *));
 void	ft_putnbr_base_fd(unsigned long int nbr, char *base, int fd);
+int		ft_addr_len(long unsigned int addr, int base);
 
 #endif

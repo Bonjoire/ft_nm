@@ -6,25 +6,28 @@
 /*   By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 14:34:27 by hubourge          #+#    #+#             */
-/*   Updated: 2025/01/29 19:50:04 by hubourge         ###   ########.fr       */
+/*   Updated: 2025/01/31 17:07:15 by hubourge         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "nm.h"
 
-void    init_data(t_data *data)
+void    init_data(t_data *data, int opt_status)
 {
     data->fd = -1;
     data->mapped_file = NULL;
     data->header64 = NULL;
     data->header32 = NULL;
-    data->files = NULL;
-    data->opt_a = 0;
-    data->opt_g = 0;
-    data->opt_u = 0;
-    data->opt_r = 0;
-    data->opt_p = 0;
-    data->opt_h = 0;
+    if (opt_status == DO_INIT_OPT)
+    {
+        data->nb_files = 0;
+        data->opt_a = 0;
+        data->opt_g = 0;
+        data->opt_u = 0;
+        data->opt_r = 0;
+        data->opt_p = 0;
+        data->opt_h = 0;
+    }
 }
 
 void    free_all_exit(t_data data, int exit_status)
@@ -33,12 +36,6 @@ void    free_all_exit(t_data data, int exit_status)
         munmap(data.mapped_file, data.statbuf.st_size);
     if (data.fd != -1)
         close(data.fd);
-    if (data.files)
-    {
-        for (int i = 0; data.files[i]; i++)
-            free(data.files[i]);
-        free(data.files);
-    }
     if (exit_status == EXIT_FAILURE)
         exit(EXIT_FAILURE);
 }
@@ -63,6 +60,22 @@ void sort_symbols(t_symbol *symbols, size_t count)
 	}
 }
 
+void	print_values(int size, int is_undef, long unsigned int address, char type, char *name)
+{
+	if (is_undef)
+	{
+		for (int i = 0; i < size; i++)
+			ft_putchar_fd(' ', 1);
+		ft_printf(" %c %s\n", type, name);
+	}
+	else
+	{
+		for(int i = ft_addr_len(address, 16); i < size; i++)
+			ft_putchar_fd('0', 1);
+		ft_putnbr_base_fd(address, "0123456789abcdef", 1);
+		ft_printf(" %c %s\n",  type, name);
+	}
+}
 
 void	show_stat(struct stat statbuf)
 {

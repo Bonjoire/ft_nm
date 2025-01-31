@@ -6,7 +6,7 @@
 /*   By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 17:10:51 by hubourge          #+#    #+#             */
-/*   Updated: 2025/01/29 17:23:12 by hubourge         ###   ########.fr       */
+/*   Updated: 2025/01/30 17:44:57 by hubourge         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ void	*map_file(t_data *data, char *file)
 	return(data->mapped_file);
 }
 
-int	detect_valid_elf(t_data *data, void *mapped_file)
+void	detect_valid_elf(t_data *data, void *mapped_file)
 {
 	// Check if the file is an ELF file
 	unsigned char *e_ident = (unsigned char *)mapped_file;
@@ -48,87 +48,28 @@ int	detect_valid_elf(t_data *data, void *mapped_file)
         e_ident[EI_MAG3] != ELFMAG3)
 	{
 		ft_putstr_fd("Invalid ELF file\n", STDERR_FILENO);
-		return(0);
+		free_all_exit(*data, EXIT_FAILURE);
 	}
 
 	// Detect 32 or 64 bits ELF file
 	if (e_ident[EI_CLASS] == ELFCLASS64)
-	{
 		handle64(data);
-	}
 	else if(e_ident[EI_CLASS] == ELFCLASS32)
-	{
 		handle32(data);
-	}
 	else
 	{
 		ft_putstr_fd("Invalid ELF file\n", STDERR_FILENO);
-		return(0);
+		free_all_exit(*data, EXIT_FAILURE);
 	}
-
-	return(1);
 }
-
-// ELF Header
-// typedef struct {
-// 	unsigned char e_ident[EI_NIDENT];
-// 	uint16_t      e_type;
-// 	uint16_t      e_machine;
-// 	uint32_t      e_version;
-// 	ElfN_Addr     e_entry;
-// 	ElfN_Off      e_phoff;
-// 	ElfN_Off      e_shoff;
-// 	uint32_t      e_flags;
-// 	uint16_t      e_ehsize;
-// 	uint16_t      e_phentsize;
-// 	uint16_t      e_phnum;
-// 	uint16_t      e_shentsize;
-// 	uint16_t      e_shnum;
-// 	uint16_t      e_shstrndx;
-// } ElfN_Ehdr;
-
-// Section Header
-// typedef struct {
-// 	uint32_t   sh_name;
-// 	uint32_t   sh_type;
-// 	uintN_t   sh_flags;
-// 	ElfN_Addr sh_addr;
-// 	ElfN_Off  sh_offset;
-// 	uintN_t   sh_size;
-// 	uint32_t   sh_link;
-// 	uint32_t   sh_info;
-// 	uintN_t   sh_addralign;
-// 	uintN_t   sh_entsize;
-// } ElfN_Shdr;
-
-// Section 0: 
-// Section 1: .text
-// Section 2: .data
-// Section 3: .bss
-// Section 4: .debug_info
-// Section 5: .rela.debug_info
-// Section 6: .debug_abbrev
-// Section 7: .debug_aranges
-// Section 8: .rela.debug_aranges
-// Section 9: .debug_line
-// Section 10: .rela.debug_line
-// Section 11: .debug_str
-// Section 12: .comment
-// Section 13: .note.GNU-stack
-// Section 14: .note.gnu.property
-// Section 15: .eh_frame
-// Section 16: .rela.eh_frame
-// Section 17: .symtab
-// Section 18: .strtab
-// Section 19: .shstrtab
 
 void	handle64(t_data *data)
 {
 	// ELF Header and Section Header
-	Elf64_Ehdr	*header		= (Elf64_Ehdr *)data->mapped_file;
+	Elf64_Ehdr	*header			= (Elf64_Ehdr *)data->mapped_file;
 	Elf64_Shdr	*section_header	= (Elf64_Shdr *)((char *)data->mapped_file + header->e_shoff);
-	uint16_t	nb_sections	= header->e_shnum;
-	data->header64 = header;
+	uint16_t	nb_sections		= header->e_shnum;
+	data->header64				= header;
 
 	// Table of section_header
 	Elf64_Shdr	*section_tab_header	= &section_header[header->e_shstrndx];
@@ -163,10 +104,10 @@ void	handle64(t_data *data)
 void	handle32(t_data *data)
 {
 	// ELF Header and Section Header
-	Elf32_Ehdr	*header		= (Elf32_Ehdr *)data->mapped_file;
+	Elf32_Ehdr	*header			= (Elf32_Ehdr *)data->mapped_file;
 	Elf32_Shdr	*section_header	= (Elf32_Shdr *)((char *)data->mapped_file + header->e_shoff);
-	uint16_t	nb_sections	= header->e_shnum;
-	data->header32 = header;
+	uint16_t	nb_sections		= header->e_shnum;
+	data->header32				= header;
 
 	// Table of section_header
 	Elf32_Shdr	*section_tab_header	= &section_header[header->e_shstrndx];
