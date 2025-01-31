@@ -54,7 +54,11 @@ void	parse_symbols64(t_data *data, Elf64_Shdr *symtab_section, Elf64_Shdr *strta
 		uint16_t	symbol_index	= symbol->st_shndx;
 		char		symbol_type;
 
-		get_set_symbol_type64(&symbol_type, type, bind, symbol_index, section_header);
+		// Ignore symbols based on options
+		if (data->opt_u && symbol_index != SHN_UNDEF)
+			continue;
+
+		get_set_symbol_type64(data, &symbol_type, type, bind, symbol_index, section_header);
 		symbols[symbol_count].name = symbol_name;
 		symbols[symbol_count].type = symbol_type;
 		symbols[symbol_count].address = symbol_addr;
@@ -62,7 +66,7 @@ void	parse_symbols64(t_data *data, Elf64_Shdr *symtab_section, Elf64_Shdr *strta
 		symbol_count++;
 	}
 
-	sort_symbols(symbols, symbol_count);
+	sort_symbols(data, symbols, symbol_count);
 	for (size_t i = 0; i < symbol_count; i++)
 	{
 		if (symbols[i].symbol64->st_shndx == SHN_UNDEF)	// Undefined symbol
@@ -116,15 +120,19 @@ void	parse_symbols32(t_data *data, Elf32_Shdr *symtab_section, Elf32_Shdr *strta
 		uint16_t	symbol_index	= symbol->st_shndx;
 		char		symbol_type;
 
-		get_set_symbol_type32(&symbol_type, type, bind, symbol_index, section_header);
+		// Ignore symbols based on options
+		if (data->opt_u && symbol_index != SHN_UNDEF)
+			continue;
+
+		get_set_symbol_type32(data, &symbol_type, type, bind, symbol_index, section_header);
 		symbols[symbol_count].name = symbol_name;
 		symbols[symbol_count].type = symbol_type;
-		symbols[symbol_count].address = symbol_addr + 100000;
+		symbols[symbol_count].address = symbol_addr;
 		symbols[symbol_count].symbol32 = symbol;
 		symbol_count++;
 	}
 
-	sort_symbols(symbols, symbol_count);
+	sort_symbols(data, symbols, symbol_count);
 	for (size_t i = 0; i < symbol_count; i++)
 	{
 		if (symbols[i].symbol32->st_shndx == SHN_UNDEF)	// Undefined symbol
@@ -135,8 +143,9 @@ void	parse_symbols32(t_data *data, Elf32_Shdr *symtab_section, Elf32_Shdr *strta
 	free(symbols);
 }
 
-void get_set_symbol_type64(char *symbol_type, uint8_t type, uint8_t bind, uint16_t symbol_index, Elf64_Shdr *section_header)
+void get_set_symbol_type64(t_data *data, char *symbol_type, uint8_t type, uint8_t bind, uint16_t symbol_index, Elf64_Shdr *section_header)
 {
+	(void)data;
 	if (symbol_index == SHN_UNDEF)		// Weak or Undefined symbol
 		*symbol_type = (bind == STB_WEAK) ? 'w' : 'U';
 	if (symbol_index == SHN_ABS)		// Absolute symbol
@@ -146,33 +155,42 @@ void get_set_symbol_type64(char *symbol_type, uint8_t type, uint8_t bind, uint16
 	if (symbol_index == SHN_UNDEF || symbol_index == SHN_ABS || symbol_index == SHN_COMMON)
 		return;
 
-    // Get section table
-    Elf64_Shdr *section_tab_header = &section_header[symbol_index];
+	// Handle other weak symbols
+	if (bind == STB_WEAK) {
+		if (type == STT_OBJECT)
+            *symbol_type = (bind == STB_LOCAL) ? 'v' : 'V'; // Weak object
+		else
+            *symbol_type = (bind == STB_LOCAL) ? 'w' : 'W'; // Weak function
+		return;
+	}
 
-    if (section_tab_header->sh_type == SHT_NOBITS)
+	if (data->opt_g && bind != STB_GLOBAL)
+	{
+		*symbol_type = '0';
+		return;
+	}
+
+	// Get section table
+	Elf64_Shdr *section_tab_header = &section_header[symbol_index];
+	if (section_tab_header->sh_type == SHT_NOBITS)
         *symbol_type = (bind == STB_LOCAL) ? 'b' : 'B'; // Uninitialized data (.bss)
-    else if (section_tab_header->sh_flags & SHF_EXECINSTR)
+	else if (section_tab_header->sh_flags & SHF_EXECINSTR)
         *symbol_type = (bind == STB_LOCAL) ? 't' : 'T'; // Executable code (.text)
-    else if (section_tab_header->sh_flags & SHF_WRITE)
+	else if (section_tab_header->sh_flags & SHF_WRITE)
         *symbol_type = (bind == STB_LOCAL) ? 'd' : 'D'; // Initialized data (.data)
-    else if (section_tab_header->sh_flags & SHF_ALLOC)
+	else if (section_tab_header->sh_flags & SHF_ALLOC)
         *symbol_type = (bind == STB_LOCAL) ? 'r' : 'R'; // Read-only data (.rodata)
-    else if (section_tab_header->sh_type == SHT_DYNAMIC)
+	else if (section_tab_header->sh_type == SHT_DYNAMIC)
         *symbol_type = (bind == STB_LOCAL) ? 'd' : 'D'; // Dynamic section
-    else
+	else
         *symbol_type = '?'; // Unknown or unsupported section
 
-    // Handle other weak symbols
-    if (bind == STB_WEAK) {
-        if (type == STT_OBJECT)
-            *symbol_type = (bind == STB_LOCAL) ? 'v' : 'V'; // Weak object
-        else
-            *symbol_type = (bind == STB_LOCAL) ? 'w' : 'W'; // Weak function
-    }
+	
 }
 
-void get_set_symbol_type32(char *symbol_type, uint8_t type, uint8_t bind, uint16_t symbol_index, Elf32_Shdr *section_header)
+void get_set_symbol_type32(t_data *data, char *symbol_type, uint8_t type, uint8_t bind, uint16_t symbol_index, Elf32_Shdr *section_header)
 {
+	(void)data;
 	if (symbol_index == SHN_UNDEF)		// Weak or Undefined symbol
 		*symbol_type = (bind == STB_WEAK) ? 'w' : 'U';
 	if (symbol_index == SHN_ABS)		// Absolute symbol
@@ -182,27 +200,27 @@ void get_set_symbol_type32(char *symbol_type, uint8_t type, uint8_t bind, uint16
 	if (symbol_index == SHN_UNDEF || symbol_index == SHN_ABS || symbol_index == SHN_COMMON)
 		return;
 
-    // Get section table
-    Elf32_Shdr *section_tab_header = &section_header[symbol_index];
+	// Get section table
+	Elf32_Shdr *section_tab_header = &section_header[symbol_index];
 
-    if (section_tab_header->sh_type == SHT_NOBITS)
-        *symbol_type = (bind == STB_LOCAL) ? 'b' : 'B'; // Uninitialized data (.bss)
-    else if (section_tab_header->sh_flags & SHF_EXECINSTR)
-        *symbol_type = (bind == STB_LOCAL) ? 't' : 'T'; // Executable code (.text)
-    else if (section_tab_header->sh_flags & SHF_WRITE)
-        *symbol_type = (bind == STB_LOCAL) ? 'd' : 'D'; // Initialized data (.data)
-    else if (section_tab_header->sh_flags & SHF_ALLOC)
-        *symbol_type = (bind == STB_LOCAL) ? 'r' : 'R'; // Read-only data (.rodata)
-    else if (section_tab_header->sh_type == SHT_DYNAMIC)
-        *symbol_type = (bind == STB_LOCAL) ? 'd' : 'D'; // Dynamic section
-    else
-        *symbol_type = '?'; // Unknown or unsupported section
+	if (section_tab_header->sh_type == SHT_NOBITS)
+		*symbol_type = (bind == STB_LOCAL) ? 'b' : 'B'; // Uninitialized data (.bss)
+	else if (section_tab_header->sh_flags & SHF_EXECINSTR)
+		*symbol_type = (bind == STB_LOCAL) ? 't' : 'T'; // Executable code (.text)
+	else if (section_tab_header->sh_flags & SHF_WRITE)
+		*symbol_type = (bind == STB_LOCAL) ? 'd' : 'D'; // Initialized data (.data)
+	else if (section_tab_header->sh_flags & SHF_ALLOC)
+		*symbol_type = (bind == STB_LOCAL) ? 'r' : 'R'; // Read-only data (.rodata)
+	else if (section_tab_header->sh_type == SHT_DYNAMIC)
+		*symbol_type = (bind == STB_LOCAL) ? 'd' : 'D'; // Dynamic section
+	else
+		*symbol_type = '?'; // Unknown or unsupported section
 
-    // Handle other weak symbols
-    if (bind == STB_WEAK) {
-        if (type == STT_OBJECT)
-            *symbol_type = (bind == STB_LOCAL) ? 'v' : 'V'; // Weak object
-        else
-            *symbol_type = (bind == STB_LOCAL) ? 'w' : 'W'; // Weak function
-    }
+	// Handle other weak symbols
+	if (bind == STB_WEAK) {
+		if (type == STT_OBJECT)
+			*symbol_type = (bind == STB_LOCAL) ? 'v' : 'V'; // Weak object
+		else
+			*symbol_type = (bind == STB_LOCAL) ? 'w' : 'W'; // Weak function
+	}
 }

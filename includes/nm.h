@@ -6,7 +6,7 @@
 /*   By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 14:34:54 by hubourge          #+#    #+#             */
-/*   Updated: 2025/01/31 11:28:18 by hubourge         ###   ########.fr       */
+/*   Updated: 2025/02/01 00:02:16 by hubourge         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,8 +65,8 @@ void	handle32(t_data *data);
 // parse_symbol.c
 void	parse_symbols64(t_data *data, Elf64_Shdr *symtab_section, Elf64_Shdr *strtab_section, Elf64_Shdr *section_header);
 void	parse_symbols32(t_data *data, Elf32_Shdr *symtab_section, Elf32_Shdr *strtab_section, Elf32_Shdr *section_header);
-void	get_set_symbol_type64(char *symbol_type, uint8_t type, uint8_t bind, uint16_t symbol_index, Elf64_Shdr *section_header);
-void	get_set_symbol_type32(char *symbol_type, uint8_t type, uint8_t bind, uint16_t symbol_index, Elf32_Shdr *section_header);
+void	get_set_symbol_type64(t_data *data, char *symbol_type, uint8_t type, uint8_t bind, uint16_t symbol_index, Elf64_Shdr *section_header);
+void	get_set_symbol_type32(t_data *data, char *symbol_type, uint8_t type, uint8_t bind, uint16_t symbol_index, Elf32_Shdr *section_header);
 
 // parsing.c
 void	parsing(t_data *data, char **av);
@@ -78,7 +78,7 @@ void	print_help(void);
 // utils.c
 void	init_data(t_data *data, int ipt_status);
 void    free_all_exit(t_data data, int exit_status);
-void	sort_symbols(t_symbol *symbols, size_t count);
+void	sort_symbols(t_data *data, t_symbol *symbols, size_t count);
 void	print_values(int size, int is_undef, long unsigned int address, char type, char *name);
 void	show_stat(struct stat statbuf);
 void	show_elf64(Elf64_Ehdr *header);
