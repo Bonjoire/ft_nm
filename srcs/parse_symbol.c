@@ -184,8 +184,6 @@ void get_set_symbol_type64(t_data *data, char *symbol_type, uint8_t type, uint8_
         *symbol_type = (bind == STB_LOCAL) ? 'd' : 'D'; // Dynamic section
 	else
         *symbol_type = '?'; // Unknown or unsupported section
-
-	
 }
 
 void get_set_symbol_type32(t_data *data, char *symbol_type, uint8_t type, uint8_t bind, uint16_t symbol_index, Elf32_Shdr *section_header)
@@ -200,27 +198,33 @@ void get_set_symbol_type32(t_data *data, char *symbol_type, uint8_t type, uint8_
 	if (symbol_index == SHN_UNDEF || symbol_index == SHN_ABS || symbol_index == SHN_COMMON)
 		return;
 
-	// Get section table
-	Elf32_Shdr *section_tab_header = &section_header[symbol_index];
-
-	if (section_tab_header->sh_type == SHT_NOBITS)
-		*symbol_type = (bind == STB_LOCAL) ? 'b' : 'B'; // Uninitialized data (.bss)
-	else if (section_tab_header->sh_flags & SHF_EXECINSTR)
-		*symbol_type = (bind == STB_LOCAL) ? 't' : 'T'; // Executable code (.text)
-	else if (section_tab_header->sh_flags & SHF_WRITE)
-		*symbol_type = (bind == STB_LOCAL) ? 'd' : 'D'; // Initialized data (.data)
-	else if (section_tab_header->sh_flags & SHF_ALLOC)
-		*symbol_type = (bind == STB_LOCAL) ? 'r' : 'R'; // Read-only data (.rodata)
-	else if (section_tab_header->sh_type == SHT_DYNAMIC)
-		*symbol_type = (bind == STB_LOCAL) ? 'd' : 'D'; // Dynamic section
-	else
-		*symbol_type = '?'; // Unknown or unsupported section
-
 	// Handle other weak symbols
 	if (bind == STB_WEAK) {
 		if (type == STT_OBJECT)
-			*symbol_type = (bind == STB_LOCAL) ? 'v' : 'V'; // Weak object
+            *symbol_type = (bind == STB_LOCAL) ? 'v' : 'V'; // Weak object
 		else
-			*symbol_type = (bind == STB_LOCAL) ? 'w' : 'W'; // Weak function
+            *symbol_type = (bind == STB_LOCAL) ? 'w' : 'W'; // Weak function
+		return;
 	}
+
+	if (data->opt_g && bind != STB_GLOBAL)
+	{
+		*symbol_type = '0';
+		return;
+	}
+
+	// Get section table
+	Elf32_Shdr *section_tab_header = &section_header[symbol_index];
+	if (section_tab_header->sh_type == SHT_NOBITS)
+        *symbol_type = (bind == STB_LOCAL) ? 'b' : 'B'; // Uninitialized data (.bss)
+	else if (section_tab_header->sh_flags & SHF_EXECINSTR)
+        *symbol_type = (bind == STB_LOCAL) ? 't' : 'T'; // Executable code (.text)
+	else if (section_tab_header->sh_flags & SHF_WRITE)
+        *symbol_type = (bind == STB_LOCAL) ? 'd' : 'D'; // Initialized data (.data)
+	else if (section_tab_header->sh_flags & SHF_ALLOC)
+        *symbol_type = (bind == STB_LOCAL) ? 'r' : 'R'; // Read-only data (.rodata)
+	else if (section_tab_header->sh_type == SHT_DYNAMIC)
+        *symbol_type = (bind == STB_LOCAL) ? 'd' : 'D'; // Dynamic section
+	else
+        *symbol_type = '?'; // Unknown or unsupported section
 }
