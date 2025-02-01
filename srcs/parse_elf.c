@@ -6,7 +6,7 @@
 /*   By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 17:10:51 by hubourge          #+#    #+#             */
-/*   Updated: 2025/02/01 15:28:39 by hubourge         ###   ########.fr       */
+/*   Updated: 2025/02/01 23:54:18 by hubourge         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,10 +42,10 @@ void	detect_valid_elf(t_data *data, void *mapped_file)
 {
 	// Check if the file is an ELF file
 	unsigned char *e_ident = (unsigned char *)mapped_file;
-    if (e_ident[EI_MAG0] != ELFMAG0 ||
-        e_ident[EI_MAG1] != ELFMAG1 ||
-        e_ident[EI_MAG2] != ELFMAG2 ||
-        e_ident[EI_MAG3] != ELFMAG3)
+	if (e_ident[EI_MAG0] != ELFMAG0 ||
+		e_ident[EI_MAG1] != ELFMAG1 ||
+		e_ident[EI_MAG2] != ELFMAG2 ||
+		e_ident[EI_MAG3] != ELFMAG3)
 	{
 		ft_putstr_fd("Invalid ELF file\n", STDERR_FILENO);
 		free_all_exit(*data, EXIT_FAILURE);
@@ -77,7 +77,7 @@ void	handle64(t_data *data)
 
 	// Parse sections symbols;
 	Elf64_Shdr	*symtab_section	= NULL;
-    Elf64_Shdr	*strtab_section	= NULL;
+	Elf64_Shdr	*strtab_section	= NULL;
 
 	// Find .symtab and .strtab sections
 	for (uint16_t i = 0; i < nb_sections; i++)
@@ -115,7 +115,7 @@ void	handle32(t_data *data)
 
 	// Parse sections symbols;
 	Elf32_Shdr	*symtab_section	= NULL;
-    Elf32_Shdr	*strtab_section	= NULL;
+	Elf32_Shdr	*strtab_section	= NULL;
 
 	// Find .symtab and .strtab sections
 	for (uint16_t i = 0; i < nb_sections; i++)

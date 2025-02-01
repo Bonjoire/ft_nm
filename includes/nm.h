@@ -6,7 +6,7 @@
 /*   By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 14:34:54 by hubourge          #+#    #+#             */
-/*   Updated: 2025/02/01 19:18:29 by hubourge         ###   ########.fr       */
+/*   Updated: 2025/02/02 00:06:23 by hubourge         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,14 +37,12 @@
 
 typedef struct s_data
 {
-	int			fd;
 	void		*mapped_file;
 	struct stat	statbuf;
 	Elf64_Ehdr	*header64;
 	Elf32_Ehdr	*header32;
 	size_t		nb_files;
-	int			file_type;
-	int			opt_a;
+	int			fd;
 	int			opt_g;
 	int			opt_u;
 	int			opt_r;
@@ -55,9 +53,9 @@ typedef struct s_data
 typedef struct s_symbol {
 	Elf64_Sym		*symbol64;
 	Elf32_Sym		*symbol32;
+	unsigned long	address;
 	char			*name;
 	char			type;
-	unsigned long	address;
 }				t_symbol;
 
 // elf_parser.c
@@ -84,10 +82,5 @@ void	init_data(t_data *data, int ipt_status);
 void    free_all_exit(t_data data, int exit_status);
 void	sort_symbols(t_data *data, t_symbol *symbols, size_t count);
 void	print_values(int size, int is_undef, long unsigned int address, char type, char *name);
-void	get_file_type(t_data *data, char *file);
-void	show_stat(struct stat statbuf);
-void	show_elf64(Elf64_Ehdr *header);
-void    show_section64(Elf64_Shdr *section);
-void    show_symbol64(Elf64_Sym *symbol);
 
 #endif

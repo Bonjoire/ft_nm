@@ -6,7 +6,7 @@
 /*   By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/29 11:14:29 by hubourge          #+#    #+#             */
-/*   Updated: 2025/01/30 17:33:31 by hubourge         ###   ########.fr       */
+/*   Updated: 2025/02/01 22:29:47 by hubourge         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,8 +53,7 @@ int	is_option_set(t_data *data, char *str)
 		i++;
 		if (!str[i]) // Ingone --
 			return (1);
-		if (find_str_set_option(str, "--debug-syms", &data->opt_a, 1) \
-			|| find_str_set_option(str, "--extern-only", &data->opt_g, 1) \
+		if (find_str_set_option(str, "--extern-only", &data->opt_g, 1) \
 			|| find_str_set_option(str, "--undefined-only", &data->opt_u, 1) \
 			|| find_str_set_option(str, "--reverse-sort", &data->opt_r, 1) \
 			|| find_str_set_option(str, "--no-sort", &data->opt_p, 1) \
@@ -65,8 +64,7 @@ int	is_option_set(t_data *data, char *str)
 	{
 		while (str[i])
 		{
-			if (find_char_set_option(str[i], 'a', &data->opt_a, 1) \
-				|| find_char_set_option(str[i], 'g', &data->opt_g, 1) \
+			if (find_char_set_option(str[i], 'g', &data->opt_g, 1) \
 				|| find_char_set_option(str[i], 'u', &data->opt_u, 1) \
 				|| find_char_set_option(str[i], 'r', &data->opt_r, 1) \
 				|| find_char_set_option(str[i], 'p', &data->opt_p, 1) \
@@ -106,7 +104,6 @@ void	print_help(void)
 	ft_putstr_fd("	List symbols in [file(s)] (a.out by default).\n", 2);
 	ft_putstr_fd("	The options are:\n", 2);
 	ft_putstr_fd(" 		-h, --help\tDisplay this information\n", 2);
-	ft_putstr_fd("		-a, --debug-syms       Display debugger-only symbols\n", 2);
 	ft_putstr_fd("		-g, --extern-only      Display only external symbols\n", 2);
 	ft_putstr_fd("		-u, --undefined-only   Display only undefined symbols\n", 2);
 	ft_putstr_fd("		-r, --reverse-sort     Reverse the sense of the sort\n", 2);
