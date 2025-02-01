@@ -21,13 +21,29 @@ void	parse_symbols64(t_data *data, Elf64_Shdr *symtab_section, Elf64_Shdr *strta
 	}
 
 	// Get symbol, string tables
-	Elf64_Sym	*symtab		= (Elf64_Sym *)((char *)data->mapped_file + symtab_section->sh_offset);
-	char		*strtab		= (char *)data->mapped_file + strtab_section->sh_offset;
-	size_t		nb_symbols	= symtab_section->sh_size / sizeof(Elf64_Sym);
+	Elf64_Sym	*symtab				= (Elf64_Sym *)((char *)data->mapped_file + symtab_section->sh_offset);
+	char		*strtab				= (char *)data->mapped_file + strtab_section->sh_offset;
+	size_t		nb_symbols			= symtab_section->sh_size / sizeof(Elf64_Sym);
+	size_t		nb_section_flag_a	= 0;
+
+
+	if (data->opt_a && data->file_type == FILE_TYPE_OBJECT)
+	{
+		for (size_t i = 0; i < data->header64->e_shnum; i++)
+		{
+			char *section_name = (char *)(data->mapped_file + section_header[data->header64->e_shstrndx].sh_offset + section_header[i].sh_name);
+
+			// Vérifie si la section fait partie de celles affichées par nm
+			if (strcmp(section_name, ".text") == 0 \
+				|| (strncmp(section_name, ".debug_", 7) == 0 \
+				&& strcmp(section_name, ".debug_aranges") != 0))
+				nb_section_flag_a++;
+		}
+	}
 
 	// Symbol array
 	size_t		symbol_count	= 0;
-	t_symbol	*symbols		= malloc(nb_symbols * sizeof(t_symbol));
+	t_symbol	*symbols		= malloc((nb_symbols + nb_section_flag_a )* sizeof(t_symbol));
 	if (!symbols)
 	{
 		perror("malloc");
@@ -41,18 +57,30 @@ void	parse_symbols64(t_data *data, Elf64_Shdr *symtab_section, Elf64_Shdr *strta
 		char				*symbol_name	= &strtab[symbol->st_name];
 		long unsigned int	symbol_addr		= symbol->st_value;
 
-		if (symbol->st_name == 0 || symbol_name[0] == '\0') // Ignore empty symbol
-			continue;
-		if (ELF64_ST_TYPE(symbol->st_info) == STT_FILE)		// Ignore file named symbols
-			continue;
-		// if (symbol->st_shndx >= data->header64->e_shnum && symbol->st_shndx != SHN_ABS && symbol->st_shndx != SHN_COMMON) // Ignore invalid section
-		// 	continue;
+		// printf("Checking: symbol_index = %d, symbol_name = %s\n", symbol->st_shndx, symbol_name);
+
 
 		// Get symbol type
 		uint8_t		type			= ELF64_ST_TYPE(symbol->st_info);
 		uint8_t		bind			= ELF64_ST_BIND(symbol->st_info); // Local or global
 		uint16_t	symbol_index	= symbol->st_shndx;
 		char		symbol_type;
+
+		// printf("symbol_name = %s, symbol_index = %d\n", symbol_name, symbol_index);
+		if (data->opt_a == 0 || (data->opt_a && (symbol_index != SHN_ABS)))
+		{
+			if (symbol->st_name == 0 || symbol_name[0] == '\0')
+				continue;
+		}
+		if (data->opt_a == 0 && type == STT_FILE)		// Ignore file named symbols
+			continue;
+
+		// if (symbol->st_name == 0 || symbol_name[0] == '\0') // Ignore empty symbol
+		// 	continue;
+		// if (data->opt_a == 0 && ELF64_ST_TYPE(symbol->st_info) == STT_FILE)		// Ignore file named symbols
+		// 	continue;
+		// printf("symbol_name = %s, symbol_index = %d\n", symbol_name, symbol_index);
+
 
 		// Ignore symbols based on options
 		if (data->opt_u && symbol_index != SHN_UNDEF)
@@ -66,15 +94,43 @@ void	parse_symbols64(t_data *data, Elf64_Shdr *symtab_section, Elf64_Shdr *strta
 		symbol_count++;
 	}
 
+	if (data->opt_a && data->file_type == FILE_TYPE_OBJECT)
+	{
+		for (size_t i = 0; i < data->header64->e_shnum; i++)
+		{
+			char *section_name = (char *)(data->mapped_file + section_header[data->header64->e_shstrndx].sh_offset + section_header[i].sh_name);
+
+			// Vérifie si la section fait partie de celles affichées par nm
+			if (strcmp(section_name, ".text") == 0 \
+				|| (strncmp(section_name, ".debug_", 7) == 0 \
+				&& strcmp(section_name, ".debug_aranges") != 0))
+			{
+				// Détermine le bon symbole en fonction de la section
+				char symbol_type;
+				if (strcmp(section_name, ".text") == 0)
+					symbol_type = 't';  // Section code, minuscule pour local
+				else
+					symbol_type = 'N';  // Sections debug
+				
+				long unsigned int symbol_addr = section_header[i].sh_addr;
+
+				symbols[symbol_count].name = section_name;
+				symbols[symbol_count].type = symbol_type;
+				symbols[symbol_count].address = symbol_addr;
+				symbols[symbol_count].symbol64 = NULL;
+				symbol_count++;
+			}
+		}
+	}
+
 	sort_symbols(data, symbols, symbol_count);
 	for (size_t i = 0; i < symbol_count; i++)
 	{
-		if (symbols[i].symbol64->st_shndx == SHN_UNDEF)	// Undefined symbol
+		if (symbols[i].symbol64 && symbols[i].symbol64->st_shndx == SHN_UNDEF)	// Undefined symbol
 			print_values(16, UNDEF, 0, symbols[i].type, symbols[i].name);
 		else											// Defined symbol
 			print_values(16, NOT_UNDEF, symbols[i].address, symbols[i].type, symbols[i].name);
 	}
-
 	free(symbols);
 }
 
@@ -149,9 +205,9 @@ void get_set_symbol_type64(t_data *data, char *symbol_type, uint8_t type, uint8_
 	if (symbol_index == SHN_UNDEF)		// Weak or Undefined symbol
 		*symbol_type = (bind == STB_WEAK) ? 'w' : 'U';
 	if (symbol_index == SHN_ABS)		// Absolute symbol
-		*symbol_type = 'A';
+		*symbol_type = (bind == STB_LOCAL) ? 'a' : 'A';
 	if (symbol_index == SHN_COMMON)		// Common symbol
-		*symbol_type = 'C';
+		*symbol_type = (bind == STB_LOCAL) ? 'C' : 'C';
 	if (symbol_index == SHN_UNDEF || symbol_index == SHN_ABS || symbol_index == SHN_COMMON)
 		return;
 
@@ -192,9 +248,9 @@ void get_set_symbol_type32(t_data *data, char *symbol_type, uint8_t type, uint8_
 	if (symbol_index == SHN_UNDEF)		// Weak or Undefined symbol
 		*symbol_type = (bind == STB_WEAK) ? 'w' : 'U';
 	if (symbol_index == SHN_ABS)		// Absolute symbol
-		*symbol_type = 'A';
+		*symbol_type = (bind == STB_LOCAL) ? 'a' : 'A';
 	if (symbol_index == SHN_COMMON)		// Common symbol
-		*symbol_type = 'C';
+		*symbol_type = (bind == STB_LOCAL) ? 'C' : 'C';
 	if (symbol_index == SHN_UNDEF || symbol_index == SHN_ABS || symbol_index == SHN_COMMON)
 		return;
 

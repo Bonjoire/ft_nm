@@ -6,7 +6,7 @@
 /*   By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 14:34:34 by hubourge          #+#    #+#             */
-/*   Updated: 2025/01/30 17:54:33 by hubourge         ###   ########.fr       */
+/*   Updated: 2025/02/01 19:18:01 by hubourge         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@ int	main(int ac, char **av)
 		if (av[i][0] != '-')
 		{
 			init_data(&data, DO_NOT_INIT_OPT);
+			get_file_type(&data, av[i]);
 			
 			if (data.nb_files > 1)
 			{

@@ -6,7 +6,7 @@
 /*   By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 17:10:51 by hubourge          #+#    #+#             */
-/*   Updated: 2025/01/30 17:44:57 by hubourge         ###   ########.fr       */
+/*   Updated: 2025/02/01 15:28:39 by hubourge         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,9 +84,9 @@ void	handle64(t_data *data)
 	{
 		const char	*section_name = &section_tab[section_header[i].sh_name];
 
-		if (!symtab_section && strcmp(section_name, ".symtab") == 0)
+		if (!symtab_section && ft_strncmp(section_name, ".symtab", ft_strlen(".symtab") + 1) == 0)
 			symtab_section = &section_header[i];
-		else if (!strtab_section && strcmp(section_name, ".strtab") == 0)
+		else if (!strtab_section && ft_strncmp(section_name, ".strtab", ft_strlen(".strtab") + 1) == 0)
 			strtab_section = &section_header[i];
 		if (symtab_section && strtab_section)
 			break;
@@ -122,9 +122,9 @@ void	handle32(t_data *data)
 	{
 		const char	*section_name = &section_tab[section_header[i].sh_name];
 
-		if (!symtab_section && strcmp(section_name, ".symtab") == 0)
+		if (!symtab_section && ft_strncmp(section_name, ".symtab", ft_strlen(".symtab") + 1) == 0)
 			symtab_section = &section_header[i];
-		else if (!strtab_section && strcmp(section_name, ".strtab") == 0)
+		else if (!strtab_section && ft_strncmp(section_name, ".strtab", ft_strlen(".strtab") + 1) == 0)
 			strtab_section = &section_header[i];
 		if (symtab_section && strtab_section)
 			break;

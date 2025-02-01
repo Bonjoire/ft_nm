@@ -6,7 +6,7 @@
 /*   By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 14:34:27 by hubourge          #+#    #+#             */
-/*   Updated: 2025/02/01 00:12:14 by hubourge         ###   ########.fr       */
+/*   Updated: 2025/02/01 19:23:49 by hubourge         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@ void    init_data(t_data *data, int opt_status)
 	data->mapped_file = NULL;
 	data->header64 = NULL;
 	data->header32 = NULL;
+	data->file_type = 0;
 	if (opt_status == DO_INIT_OPT)
 	{
 		data->nb_files = 0;
@@ -49,7 +50,7 @@ void	sort_symbols(t_data *data, t_symbol *symbols, size_t count)
 	{
 		for (size_t j = 0; j < count - i - 1; j++)
 		{
-			int	cmp_result	= strcmp(symbols[j].name, symbols[j + 1].name);
+			int	cmp_result	= ft_strncmp(symbols[j].name, symbols[j + 1].name, ft_strlen(symbols[j + 1].name) + 1);
 			int	cmp_addr	= cmp_addr = symbols[j].address > symbols[j + 1].address;
 			
 			// Sort first by name, then by address
@@ -85,6 +86,22 @@ void	print_values(int size, int is_undef, long unsigned int address, char type, 
 			ft_putchar_fd('0', 1);
 		ft_putnbr_base_fd(address, "0123456789abcdef", 1);
 		ft_printf(" %c %s\n",  type, name);
+	}
+}
+
+void	get_file_type(t_data *data, char *file)
+{
+	data->file_type = FILE_TYPE_EXECUTABLE;
+	for(int i = ft_strlen(file) - 1; i >= 0; i--)
+	{
+		if (file[i] == '.')
+		{
+			if (ft_strncmp(&file[i], ".so", 4) == 0)
+				data->file_type = FILE_TYPE_SHARED_LIB;
+			else if (ft_strncmp(&file[i], ".o", 3) == 0)
+				data->file_type = FILE_TYPE_OBJECT;
+			break;
+		}
 	}
 }
 

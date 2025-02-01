@@ -6,7 +6,7 @@
 /*   By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 14:34:54 by hubourge          #+#    #+#             */
-/*   Updated: 2025/02/01 00:02:16 by hubourge         ###   ########.fr       */
+/*   Updated: 2025/02/01 19:18:29 by hubourge         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,9 @@
 # define DO_NOT_EXIT 0
 # define UNDEF 1
 # define NOT_UNDEF 0
+# define FILE_TYPE_SHARED_LIB 1
+# define FILE_TYPE_OBJECT 2
+# define FILE_TYPE_EXECUTABLE 3
 
 typedef struct s_data
 {
@@ -40,6 +43,7 @@ typedef struct s_data
 	Elf64_Ehdr	*header64;
 	Elf32_Ehdr	*header32;
 	size_t		nb_files;
+	int			file_type;
 	int			opt_a;
 	int			opt_g;
 	int			opt_u;
@@ -80,6 +84,7 @@ void	init_data(t_data *data, int ipt_status);
 void    free_all_exit(t_data data, int exit_status);
 void	sort_symbols(t_data *data, t_symbol *symbols, size_t count);
 void	print_values(int size, int is_undef, long unsigned int address, char type, char *name);
+void	get_file_type(t_data *data, char *file);
 void	show_stat(struct stat statbuf);
 void	show_elf64(Elf64_Ehdr *header);
 void    show_section64(Elf64_Shdr *section);
