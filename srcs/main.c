@@ -6,7 +6,7 @@
 /*   By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 14:34:34 by hubourge          #+#    #+#             */
-/*   Updated: 2025/02/01 22:27:53 by hubourge         ###   ########.fr       */
+/*   Updated: 2025/02/03 15:32:20 by hubourge         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,9 +21,9 @@ int	main(int ac, char **av)
 	parsing(&data, av);
 	
 	int i = 1;
-	while (av[i])
+	while (i < ac || data.nb_files == 0)
 	{
-		if (av[i][0] != '-')
+		if ((av[i] && av[i][0] != '-') || data.nb_files == 0)
 		{
 			init_data(&data, DO_NOT_INIT_OPT);
 			
@@ -33,8 +33,13 @@ int	main(int ac, char **av)
 				ft_putstr_fd(av[i], 1);
 				ft_putstr_fd(":\n", 1);
 			}
+
+			char *file = av[i];
+			if (data.nb_files == 0)
+				file = "a.out";
+			data.nb_files++;
 			
-			map_file(&data, av[i]);
+			map_file(&data, file);
 			detect_valid_elf(&data, data.mapped_file);
 			free_all_exit(data, DO_NOT_EXIT);
 		}
