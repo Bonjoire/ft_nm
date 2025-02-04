@@ -6,7 +6,7 @@
 /*   By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 14:34:34 by hubourge          #+#    #+#             */
-/*   Updated: 2025/02/03 15:32:20 by hubourge         ###   ########.fr       */
+/*   Updated: 2025/02/04 18:02:29 by hubourge         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,17 @@
 
 int	main(int ac, char **av)
 {
+	if (TEST_MODE)
+		test();
+	else
+		nm(ac, av);
+
+	return(EXIT_SUCCESS);
+}
+
+void	nm(int ac, char **av)
+{
 	t_data	data;
-	(void)ac;
 
 	init_data(&data, DO_INIT_OPT);
 	parsing(&data, av);
@@ -45,6 +54,4 @@ int	main(int ac, char **av)
 		}
 		i++;
 	}
-
-	return(EXIT_SUCCESS);
 }

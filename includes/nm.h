@@ -6,7 +6,7 @@
 /*   By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 14:34:54 by hubourge          #+#    #+#             */
-/*   Updated: 2025/02/02 00:06:23 by hubourge         ###   ########.fr       */
+/*   Updated: 2025/02/04 18:23:45 by hubourge         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,10 @@
 # define FILE_TYPE_OBJECT 2
 # define FILE_TYPE_EXECUTABLE 3
 
+# ifndef TEST_MODE
+#  define TEST_MODE 0
+# endif
+
 typedef struct s_data
 {
 	void		*mapped_file;
@@ -57,6 +61,10 @@ typedef struct s_symbol {
 	char			*name;
 	char			type;
 }				t_symbol;
+
+// main.c
+int		main(int ac, char **av);
+void	nm(int ac, char **av);;
 
 // elf_parser.c
 void	*map_file(t_data *data, char *file);
@@ -82,5 +90,8 @@ void	init_data(t_data *data, int ipt_status);
 void    free_all_exit(t_data data, int exit_status);
 void	sort_symbols(t_data *data, t_symbol *symbols, size_t count);
 void	print_values(int size, int is_undef, long unsigned int address, char type, char *name);
+
+// test.c
+void	test();
 
 #endif
