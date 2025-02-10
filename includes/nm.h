@@ -6,7 +6,7 @@
 /*   By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 14:34:54 by hubourge          #+#    #+#             */
-/*   Updated: 2025/02/04 18:23:45 by hubourge         ###   ########.fr       */
+/*   Updated: 2025/02/10 18:19:35 by hubourge         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,15 +25,19 @@
 # include <errno.h>
 # include <string.h>
 # include <time.h>
+# include <dirent.h> // test part
 
-# define DO_NOT_INIT_OPT 0
-# define DO_INIT_OPT 1
-# define DO_NOT_EXIT 0
-# define UNDEF 1
-# define NOT_UNDEF 0
-# define FILE_TYPE_SHARED_LIB 1
-# define FILE_TYPE_OBJECT 2
-# define FILE_TYPE_EXECUTABLE 3
+# define DO_NOT_INIT_OPT 		0
+# define DO_NOT_EXIT			0
+# define DO_INIT_OPT			1
+# define NOT_UNDEF				0
+# define UNDEF 					1
+# define FILE_TYPE_SHARED_LIB	1
+# define FILE_TYPE_OBJECT 		2
+# define FILE_TYPE_EXECUTABLE	3
+# define TEST_OUTPUT_FT_NM		"test_ft_nm_output.txt"
+# define TEST_OUTPUT_NM			"test_nm_output.txt"
+# define TEST_FILES_PATH		"./test_files"
 
 # ifndef TEST_MODE
 #  define TEST_MODE 0
@@ -42,6 +46,7 @@
 typedef struct s_data
 {
 	void		*mapped_file;
+	char		*file;
 	struct stat	statbuf;
 	Elf64_Ehdr	*header64;
 	Elf32_Ehdr	*header32;
@@ -67,10 +72,12 @@ int		main(int ac, char **av);
 void	nm(int ac, char **av);;
 
 // elf_parser.c
-void	*map_file(t_data *data, char *file);
+void	*map_file(t_data *data);
 void	detect_valid_elf(t_data *data, void *mapped_file);
 void	handle64(t_data *data);
 void	handle32(t_data *data);
+void	check_error64(t_data *data, Elf64_Ehdr *header, uint16_t nb_sections, Elf64_Shdr *section_tab_header);
+void	check_error32(t_data *data, Elf32_Ehdr *header, uint16_t nb_sections, Elf32_Shdr *section_tab_header);
 
 // parse_symbol.c
 void	parse_symbols64(t_data *data, Elf64_Shdr *symtab_section, Elf64_Shdr *strtab_section, Elf64_Shdr *section_header);
@@ -90,6 +97,7 @@ void	init_data(t_data *data, int ipt_status);
 void    free_all_exit(t_data data, int exit_status);
 void	sort_symbols(t_data *data, t_symbol *symbols, size_t count);
 void	print_values(int size, int is_undef, long unsigned int address, char type, char *name);
+char	*ft_strtab_to_str(char **tab);
 
 // test.c
 void	test();

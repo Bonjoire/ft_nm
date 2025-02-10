@@ -6,7 +6,7 @@
 /*   By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/29 11:14:29 by hubourge          #+#    #+#             */
-/*   Updated: 2025/02/01 22:29:47 by hubourge         ###   ########.fr       */
+/*   Updated: 2025/02/10 18:18:56 by hubourge         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,9 +24,7 @@ void	parsing(t_data *data, char **av)
 		{
 			if (is_option_set(data, av[i]) == 0)
 			{
-				ft_putstr_fd("ft_nm: unrecognized option ", 2);
-				ft_putstr_fd(av[i], 2);
-				ft_putstr_fd("\n", 2);
+				ft_printf(STDERR_FILENO, "ft_nm: unrecognized option %s\n", av[i]);
 				print_help();
 				exit(EXIT_FAILURE);
 			}
@@ -100,12 +98,12 @@ int	find_char_set_option(char c, char to_find, int *opt, int value)
 
 void	print_help(void)
 {
-	ft_putstr_fd("Usage: ./ft_nm [option(s)] [file(s)]\n", 2);
-	ft_putstr_fd("	List symbols in [file(s)] (a.out by default).\n", 2);
-	ft_putstr_fd("	The options are:\n", 2);
-	ft_putstr_fd(" 		-h, --help\tDisplay this information\n", 2);
-	ft_putstr_fd("		-g, --extern-only      Display only external symbols\n", 2);
-	ft_putstr_fd("		-u, --undefined-only   Display only undefined symbols\n", 2);
-	ft_putstr_fd("		-r, --reverse-sort     Reverse the sense of the sort\n", 2);
-	ft_putstr_fd("		-p, --no-sort          Do not sort the symbols\n", 2);
+	ft_putstr_fd("Usage: ./ft_nm [option(s)] [file(s)]\n", STDERR_FILENO);
+	ft_putstr_fd("	List symbols in [file(s)] (a.out by default).\n", STDERR_FILENO);
+	ft_putstr_fd("	The options are:\n", STDERR_FILENO);
+	ft_putstr_fd(" 		-h, --help\tDisplay this information\n", STDERR_FILENO);
+	ft_putstr_fd("		-g, --extern-only      Display only external symbols\n", STDERR_FILENO);
+	ft_putstr_fd("		-u, --undefined-only   Display only undefined symbols\n", STDERR_FILENO);
+	ft_putstr_fd("		-r, --reverse-sort     Reverse the sense of the sort\n", STDERR_FILENO);
+	ft_putstr_fd("		-p, --no-sort          Do not sort the symbols\n", STDERR_FILENO);
 }

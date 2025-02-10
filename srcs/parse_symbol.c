@@ -14,12 +14,6 @@
 
 void	parse_symbols64(t_data *data, Elf64_Shdr *symtab_section, Elf64_Shdr *strtab_section, Elf64_Shdr *section_header)
 {
-	if (!symtab_section || !strtab_section)
-	{
-		ft_putstr_fd("Invalid ELF file: Missing .symtab or .strtab\n", STDERR_FILENO);
-		free_all_exit(*data, EXIT_FAILURE);
-	}
-
 	// Get symbol, string tables
 	Elf64_Sym	*symtab				= (Elf64_Sym *)((char *)data->mapped_file + symtab_section->sh_offset);
 	char		*strtab				= (char *)data->mapped_file + strtab_section->sh_offset;
@@ -77,12 +71,6 @@ void	parse_symbols64(t_data *data, Elf64_Shdr *symtab_section, Elf64_Shdr *strta
 
 void	parse_symbols32(t_data *data, Elf32_Shdr *symtab_section, Elf32_Shdr *strtab_section, Elf32_Shdr *section_header)
 {
-	if (!symtab_section || !strtab_section)
-	{
-		ft_putstr_fd("Invalid ELF file: Missing .symtab or .strtab\n", STDERR_FILENO);
-		free_all_exit(*data, EXIT_FAILURE);
-	}
-
 	// Get symbol, string tables
 	Elf32_Sym	*symtab		= (Elf32_Sym *)((char *)data->mapped_file + symtab_section->sh_offset);
 	char		*strtab		= (char *)data->mapped_file + strtab_section->sh_offset;
@@ -130,7 +118,7 @@ void	parse_symbols32(t_data *data, Elf32_Shdr *symtab_section, Elf32_Shdr *strta
 	sort_symbols(data, symbols, symbol_count);
 	for (size_t i = 0; i < symbol_count; i++)
 	{
-		if (symbols[i].symbol64 && symbols[i].symbol32->st_shndx == SHN_UNDEF)	// Undefined symbol
+		if (symbols[i].symbol32 && symbols[i].symbol32->st_shndx == SHN_UNDEF)	// Undefined symbol
 			print_values(8, UNDEF, 0, symbols[i].type, symbols[i].name);
 		else																	// Defined symbol
 			print_values(8, NOT_UNDEF, symbols[i].address, symbols[i].type, symbols[i].name);
@@ -178,30 +166,6 @@ void get_set_symbol_type64(t_data *data, char *symbol_type, uint8_t type, uint8_
 		*symbol_type = (bind == STB_LOCAL) ? 'd' : 'D'; // Dynamic section
 	else
 		*symbol_type = '?';								// Unknown or unsupported section
-
-	// Elf64_Shdr *section_tab_header = &section_header[symbol_index];
-	// if (section_tab_header->sh_type == SHT_NOBITS)
-	// 	*symbol_type = (bind == STB_LOCAL) ? 'b' : 'B'; // Uninitialized data (.bss)
-	// else if (section_tab_header->sh_flags & SHF_EXECINSTR)
-	// 	*symbol_type = (bind == STB_LOCAL) ? 't' : 'T'; // Executable code (.text)
-	// else if (section_tab_header->sh_flags & SHF_WRITE)
-	// {
-	// 	if (section_tab_header->sh_flags & SHF_MERGE)
-	// 		*symbol_type = (bind == STB_LOCAL) ? 'g' : 'G'; // Small initialized data section
-	// 	else
-	// 		*symbol_type = (bind == STB_LOCAL) ? 'd' : 'D'; // Initialized data (.data)
-	// }
-	// else if (section_tab_header->sh_flags & SHF_ALLOC)
-	// {
-	// 	if (section_tab_header->sh_flags & SHF_MERGE)
-	// 		*symbol_type = (bind == STB_LOCAL) ? 's' : 'S'; // Small uninitialized data section
-	// 	else
-	// 		*symbol_type = (bind == STB_LOCAL) ? 'r' : 'R'; // Read-only data (.rodata)
-	// }
-	// else if (section_tab_header->sh_type == SHT_DYNAMIC)
-	// 	*symbol_type = (bind == STB_LOCAL) ? 'd' : 'D'; // Dynamic section
-	// else
-	// 	*symbol_type = '?'; // Unknown or unsupported section
 }
 
 void get_set_symbol_type32(t_data *data, char *symbol_type, uint8_t type, uint8_t bind, uint16_t symbol_index, Elf32_Shdr *section_header)

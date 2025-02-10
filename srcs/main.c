@@ -6,7 +6,7 @@
 /*   By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 14:34:34 by hubourge          #+#    #+#             */
-/*   Updated: 2025/02/04 18:02:29 by hubourge         ###   ########.fr       */
+/*   Updated: 2025/02/10 17:37:20 by hubourge         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,20 +35,15 @@ void	nm(int ac, char **av)
 		if ((av[i] && av[i][0] != '-') || data.nb_files == 0)
 		{
 			init_data(&data, DO_NOT_INIT_OPT);
-			
 			if (data.nb_files > 1)
-			{
-				ft_putstr_fd("\n", 1);
-				ft_putstr_fd(av[i], 1);
-				ft_putstr_fd(":\n", 1);
-			}
+				ft_printf(STDOUT_FILENO, "\n%s:\n", av[i]);
 
-			char *file = av[i];
+			data.file = av[i];
 			if (data.nb_files == 0)
-				file = "a.out";
+				data.file = "a.out";
 			data.nb_files++;
 			
-			map_file(&data, file);
+			map_file(&data);
 			detect_valid_elf(&data, data.mapped_file);
 			free_all_exit(data, DO_NOT_EXIT);
 		}
