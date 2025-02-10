@@ -6,7 +6,7 @@
 #    By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/01/24 14:34:48 by hubourge          #+#    #+#              #
-#    Updated: 2025/02/04 16:46:02 by hubourge         ###   ########.fr        #
+#    Updated: 2025/02/10 18:23:46 by hubourge         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -38,12 +38,11 @@ OBJ			= $(addprefix $(OBJ_DIR)/, $(SRC:.c=.o))
 
 OBJ_TEST	= $(addprefix $(OBJ_TEST_DIR)/, $(SRC:.c=.o))
 
-
-YELLOW		=\033[0;33mcd
+YELLOW		=\033[0;33m
 BIBlue		=\033[1;94m
 NC			=\033[0m
 
-all: $(LIBFT)  $(OBJ) 
+all: $(LIBFT) $(OBJ) 
 	@ echo "$(YELLOW)Compiling ft_nm...$(NC)"
 	@ $(CXX) $(CFLAGS) ${INCLUDE} -o $(NAME) $(OBJ) -L $(LIBFT_DIR) -lft
 	@ echo "$(BIBlue)"
@@ -58,16 +57,18 @@ all: $(LIBFT)  $(OBJ)
 
 bonus: all
 
-test: all $(LIBFT)  $(OBJ_TEST) 
+test: fclean $(LIBFT) $(OBJ) $(OBJ_TEST)
 	@ echo "$(YELLOW)Compiling ft_nm...$(NC)"
+	@ echo "$(YELLOW)Compiling ft_nm_test...$(NC)"
+	@ $(CXX) $(CFLAGS) ${INCLUDE} -o $(NAME) $(OBJ) -L $(LIBFT_DIR) -lft
 	@ $(CXX) $(CFLAGS) $(TEST_MODE) ${INCLUDE} -o $(NAME_TEST) $(OBJ_TEST) -L $(LIBFT_DIR) -lft
 	@ echo "$(BIBlue)"
-	@ echo "   __ _                       "
-	@ echo "  / _| |_     _ __  _ __ ___  "
-	@ echo " | |_| __|   | '_ \| '_ \` _ \ "
-	@ echo " |  _| |_    | | | | | | | | |"
-	@ echo " |_|  \__|___|_| |_|_| |_| |_|"
-	@ echo "        |_____|               "
+	@ echo "   __ _                          _            _   "
+	@ echo "  / _| |_     _ __  _ __ ___    | |_ ___  ___| |_ "
+	@ echo " | |_| __|   | '_ \| '_ \` _ \   | __/ _ \/ __| __|"
+	@ echo " |  _| |_    | | | | | | | | |  | ||  __/\__ \ |_ "
+	@ echo " |_|  \__|___|_| |_|_| |_| |_|___\__\___||___/\__|"
+	@ echo "        |_____|             |_____|               "
 	@ echo "                   by hubourge"
 	@ echo "$(NC)"
 
