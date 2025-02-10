@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_put.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hubourge <hubourge@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/17 12:21:56 by hubourge          #+#    #+#             */
-/*   Updated: 2025/01/03 19:29:37 by hubourge         ###   ########.fr       */
+/*   Updated: 2025/02/10 17:06:46 by hubourge         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,14 +34,14 @@ int	ft_pf_putnbr_fd(long long int n, int fd, int cpt)
 {
 	int	tmp;
 
-	tmp = ft_pf_check(n, cpt);
+	tmp = ft_pf_check(n, cpt, fd);
 	if (cpt != tmp)
 		return (tmp);
 	if (n < 0)
 	{
 		if (n == -2147483648)
 		{
-			write(1, "-2147483648", 11);
+			write(fd, "-2147483648", 11);
 			return (cpt + 11);
 		}
 		write(fd, "-", 1);
