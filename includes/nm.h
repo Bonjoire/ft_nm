@@ -6,7 +6,7 @@
 /*   By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 14:34:54 by hubourge          #+#    #+#             */
-/*   Updated: 2025/02/10 18:19:35 by hubourge         ###   ########.fr       */
+/*   Updated: 2025/02/10 23:16:45 by hubourge         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,12 +94,17 @@ void	print_help(void);
 
 // utils.c
 void	init_data(t_data *data, int ipt_status);
-void    free_all_exit(t_data data, int exit_status);
+void	free_all_exit(t_data data, int exit_status);
 void	sort_symbols(t_data *data, t_symbol *symbols, size_t count);
 void	print_values(int size, int is_undef, long unsigned int address, char type, char *name);
-char	*ft_strtab_to_str(char **tab);
 
 // test.c
 void	test();
+char**	get_files(char *path);
+void	exec_test(char *ft_nm, char *nm, char *file);
+int		check_test_files(char *ft_nm, char *nm, char *file, int i);
+void	clear_test_files(char *ft_nm, char *nm);
+void	del_test_files(char *ft_nm, char *nm);
+char	*ft_strtab_to_str(char **tab);
 
 #endif

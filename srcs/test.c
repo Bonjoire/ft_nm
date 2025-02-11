@@ -6,18 +6,12 @@
 /*   By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/03 17:51:45 by hubourge          #+#    #+#             */
-/*   Updated: 2025/02/10 20:10:03 by hubourge         ###   ########.fr       */
+/*   Updated: 2025/02/10 23:16:20 by hubourge         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "nm.h"
 
-char**	get_files(char *path);
-void	exec_test(char *ft_nm, char *nm, char *file);
-int		check_test_files(char *ft_nm, char *nm, char *file, int i);
-void	clear_test_files(char *ft_nm, char *nm);
-void	del_test_files(char *ft_nm, char *nm);
-int nb = 0;
 void	test()
 {
 	char	*nm		= TEST_OUTPUT_NM;
@@ -35,7 +29,6 @@ void	test()
 	}
 	ft_free_tab(files);
 	del_test_files(ft_nm, nm);
-	printf("Tests passed: %d/%ld\n", nb, tab_len);
 }
 
 void	exec_test(char *ft_nm, char *nm, char *file)
@@ -157,4 +150,25 @@ char	**get_files(char *path)
 	files[i] = NULL;
 	closedir(dir);
 	return (files);
+}
+
+char *ft_strtab_to_str(char **tab)
+{
+	size_t	len		= 0;
+	char	*str	= 0;
+	size_t	i		= -1;
+
+	while (tab[++i])
+		len += ft_strlen(tab[i]);
+	str = ft_calloc(len + 1, sizeof(char));
+	if (!str)
+		return (NULL);
+	i = -1;
+	while (tab[++i])
+	{
+		ft_strlcat(str, tab[i], len + 1);
+		if (!str)
+			return (NULL);
+	}
+	return (str);
 }
