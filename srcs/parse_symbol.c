@@ -126,7 +126,7 @@ void	parse_symbols32(t_data *data, Elf32_Shdr *symtab_section, Elf32_Shdr *strta
 	free(symbols);
 }
 
-void get_set_symbol_type64(t_data *data, char *symbol_type, uint8_t type, uint8_t bind, uint16_t symbol_index, Elf64_Shdr *section_header)
+void	get_set_symbol_type64(t_data *data, char *symbol_type, uint8_t type, uint8_t bind, uint16_t symbol_index, Elf64_Shdr *section_header)
 {
 	if (symbol_index == SHN_UNDEF)		// Weak or Undefined symbol
 		*symbol_type = (bind == STB_WEAK) ? 'w' : 'U';
@@ -172,7 +172,7 @@ void get_set_symbol_type64(t_data *data, char *symbol_type, uint8_t type, uint8_
 		*symbol_type = '?';								// Unknown or unsupported section
 }
 
-void get_set_symbol_type32(t_data *data, char *symbol_type, uint8_t type, uint8_t bind, uint16_t symbol_index, Elf32_Shdr *section_header)
+void	get_set_symbol_type32(t_data *data, char *symbol_type, uint8_t type, uint8_t bind, uint16_t symbol_index, Elf32_Shdr *section_header)
 {
 	if (symbol_index == SHN_UNDEF)		// Weak or Undefined symbol
 		*symbol_type = (bind == STB_WEAK) ? 'w' : 'U';

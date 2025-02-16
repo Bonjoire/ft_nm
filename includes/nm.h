@@ -91,6 +91,7 @@ int		find_str_set_option(char *str, char *to_find, int *opt, int value);
 int		find_char_set_option(char c, char to_find, int *opt, int value);
 int		is_option_set(t_data *data, char *str);
 void	print_help(void);
+int		file_rights(t_data *data, char *file);
 
 // utils.c
 void	init_data(t_data *data, int ipt_status);

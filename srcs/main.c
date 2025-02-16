@@ -35,6 +35,11 @@ void	nm(int ac, char **av)
 		if ((av[i] && av[i][0] != '-') || data.nb_files == 0)
 		{
 			init_data(&data, DO_NOT_INIT_OPT);
+			if (!file_rights(&data, av[i]))
+			{
+				i++;
+				continue;
+			}
 			if (data.nb_files > 1)
 				ft_printf(STDOUT_FILENO, "\n%s:\n", av[i]);
 

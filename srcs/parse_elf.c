@@ -12,21 +12,29 @@
 
 #include "nm.h"
 
-void	*map_file(t_data *data)
+int	file_rights(t_data *data, char *file)
 {
-	data->fd = open(data->file, O_RDONLY);
+	data->fd = open(file, O_RDONLY);
 	if (data->fd < 0)
 	{
-		perror("open");
-		exit(EXIT_FAILURE);
+		fprintf(stderr, "nm: %s: Permission denied\n", file);
+		return (0);
 	}
-
 	if (fstat(data->fd, &(data)->statbuf) < 0)
 	{
 		perror("fstat");
 		free_all_exit(*data, EXIT_FAILURE);
 	}
-	
+	if (S_ISDIR(data->statbuf.st_mode))
+	{
+		fprintf(stderr, "nm: Warning: '%s' is a directory\n", file);
+		return (0);
+	}
+	return (1);
+}
+
+void	*map_file(t_data *data)
+{
 	if (data->statbuf.st_size == 0)
 		free_all_exit(*data, EXIT_FAILURE);
 	data->mapped_file = mmap(NULL, data->statbuf.st_size, PROT_READ, MAP_PRIVATE, data->fd, 0);

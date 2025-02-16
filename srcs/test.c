@@ -39,7 +39,6 @@ void	test(int ac, char **av)
 	del_test_files(ft_nm, nm);
 }
 
-
 void parsing_test(int ac, char **av)
 {
 	if (ac != 6)
@@ -47,7 +46,7 @@ void parsing_test(int ac, char **av)
 
 	char **opt_vars[] = { &opt_g, &opt_u, &opt_r, &opt_p, &opt_valgrind };
 	char *valid_opts[] = { "g", "u", "r", "p", "valgrind" };
-	char *opt_values[] = { "-g ", "-u ", "-r ", "-p ", "valgrind " };
+	char *opt_values[] = { "-g ", "-u ", "-r ", "-p ", "valgrind --track-fds=yes " };
 
 	for (int i = 1; i < 6; i++)
 	{
@@ -62,10 +61,9 @@ void parsing_test(int ac, char **av)
 
 void	print_help_test(void)
 {
-	ft_putstr_fd("Usage: ./ft_nm_test g/0 u/0 r/0 p/0 v/0\n", STDERR_FILENO);
+	ft_putstr_fd("Usage: ./ft_nm_test g/0 u/0 r/0 p/0 valgrind/0\n", STDERR_FILENO);
 	exit(EXIT_FAILURE);
 }
-
 
 void	exec_test(char *ft_nm, char *nm, char *file)
 {
@@ -98,16 +96,16 @@ int is_error_similar(char *ft_nm, char *nm)
 	FILE *file_ft_nm = fopen(ft_nm, "r");
 	FILE *file_nm = fopen(nm, "r");
 
-    if (!file_ft_nm || !file_nm)
+	if (!file_ft_nm || !file_nm)
 	{
 		perror("Erreur d'ouverture");
 		return (0);
 	}
 
-    char buffer_ft_nm[256];
-    char buffer_nm[256];
-    fgets(buffer_ft_nm, sizeof(buffer_ft_nm), file_ft_nm);
-    fgets(buffer_nm, sizeof(buffer_nm), file_nm);
+	char buffer_ft_nm[256];
+	char buffer_nm[256];
+	fgets(buffer_ft_nm, sizeof(buffer_ft_nm), file_ft_nm);
+	fgets(buffer_nm, sizeof(buffer_nm), file_nm);
 
 	if (ft_strnstr(buffer_ft_nm, "file format not recognized", ft_strlen(buffer_ft_nm)) != NULL \
 		|| ft_strnstr(buffer_ft_nm, "file too short", ft_strlen(buffer_ft_nm)) != NULL)
@@ -126,6 +124,7 @@ int is_error_similar(char *ft_nm, char *nm)
 	fclose(file_nm);
 	return (0);
 }
+
 int	check_test_files(char *ft_nm, char *nm, char *file, int i)
 {
 	char	*cmd;
@@ -149,8 +148,6 @@ int	check_test_files(char *ft_nm, char *nm, char *file, int i)
 	printf("Test %-3d failed ❌: %s\n", i, file);
 	return (0);
 }
-
-
 
 void	clear_test_files(char *ft_nm, char *nm)
 {

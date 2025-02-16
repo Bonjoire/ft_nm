@@ -30,6 +30,7 @@ OBJ_TEST_DIR = obj_test
 
 SRC			=	srcs/main.c \
 				srcs/test.c \
+				srcs/sort.c \
 				srcs/utils.c \
 				srcs/parsing.c \
 				srcs/parse_elf.c \
