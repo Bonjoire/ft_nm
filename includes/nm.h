@@ -97,6 +97,7 @@ void	init_data(t_data *data, int ipt_status);
 void	free_all_exit(t_data data, int exit_status);
 void	sort_symbols(t_data *data, t_symbol *symbols, size_t count);
 void	print_values(int size, int is_undef, long unsigned int address, char type, char *name);
+int		ft_strcasecmp_nm(const char *s1, const char *s2);
 
 // test.c
 void	test();
@@ -106,5 +107,6 @@ int		check_test_files(char *ft_nm, char *nm, char *file, int i);
 void	clear_test_files(char *ft_nm, char *nm);
 void	del_test_files(char *ft_nm, char *nm);
 char	*ft_strtab_to_str(char **tab);
+int		is_error_similar(char *ft_nm, char *nm);
 
 #endif

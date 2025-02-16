@@ -39,6 +39,57 @@ void    free_all_exit(t_data data, int exit_status)
 		exit(EXIT_FAILURE);
 }
 
+int ft_strcasecmp_nm(const char *s1, const char *s2)
+{
+	int priority_s1[2];
+	int priority_s2[2];
+
+	priority_s1[0] = 0;
+	priority_s1[1] = 0;
+	priority_s2[0] = 0;
+	priority_s2[1] = 0;
+
+	while (*s1 && *s1 == '_')
+	{
+		priority_s1[0]++;
+		s1++;
+	}
+	while (*s2 && *s2 == '_')
+	{
+		priority_s2[0]++;
+		s2++;
+	}
+
+	while (*s1 && *s2)
+	{
+		while(!ft_isalnum(*s1) && *s1)
+		{
+			if (*s1 == '_')
+				priority_s1[1]++;
+			s1++;
+		}
+		while(!ft_isalnum(*s2) && *s2)
+		{
+			if (*s2 == '_')
+				priority_s2[1]++;
+			s2++;
+		}
+		if (ft_tolower(*s1) != ft_tolower(*s2))
+			return (ft_tolower(*s1) - ft_tolower(*s2));
+		s1++;
+		s2++;
+	}
+	
+	if (ft_tolower(*s1) - ft_tolower(*s2) == 0)
+	{
+		if (priority_s1[0] != priority_s2[0])
+			return (priority_s2[0] - priority_s1[0] );
+		if (priority_s1[1] != priority_s2[1])
+			return (priority_s2[1] - priority_s1[1]);
+	}
+	return (ft_tolower(*s1) - ft_tolower(*s2));
+}
+
 void	sort_symbols(t_data *data, t_symbol *symbols, size_t count)
 {
 	if (data->opt_p)
@@ -48,17 +99,21 @@ void	sort_symbols(t_data *data, t_symbol *symbols, size_t count)
 	{
 		for (size_t j = 0; j < count - i - 1; j++)
 		{
-			int	cmp_result	= ft_strncmp(symbols[j].name, symbols[j + 1].name, ft_strlen(symbols[j + 1].name) + 1);
-			int	cmp_addr	= cmp_addr = symbols[j].address > symbols[j + 1].address;
-			
-			// Sort first by name, then by address
-			if (data->opt_r && (cmp_result < 0 || (cmp_result == 0 && !cmp_addr)))
+			int cmp_result = ft_strcasecmp_nm(symbols[j].name, symbols[j + 1].name);
+			int cmp_addr = symbols[j].address > symbols[j + 1].address;
+			int cmp_type = symbols[j].type > symbols[j + 1].type;
+
+			if (cmp_result > 0 || 
+				(cmp_result == 0 && cmp_addr) ||
+				(cmp_result == 0 && symbols[j].address == symbols[j + 1].address && cmp_type))
 			{
 				t_symbol temp = symbols[j];
 				symbols[j] = symbols[j + 1];
 				symbols[j + 1] = temp;
 			}
-			else if (!data->opt_r && (cmp_result > 0 || (cmp_result == 0 && cmp_addr)))
+			if (cmp_result == 0 \
+				&& symbols[j].type == symbols[j + 1].type \
+				&& (symbols[j].address > symbols[j + 1].address || (symbols[j].address == symbols[j + 1].address)))
 			{
 				t_symbol temp = symbols[j];
 				symbols[j] = symbols[j + 1];
@@ -67,6 +122,36 @@ void	sort_symbols(t_data *data, t_symbol *symbols, size_t count)
 		}
 	}
 }
+
+// Sort for apple silicon processor
+// void	sort_symbols(t_data *data, t_symbol *symbols, size_t count)
+// {
+// 	if (data->opt_p)
+// 		return;
+
+// 	for (size_t i = 0; i < count - 1; i++)
+// 	{
+// 		for (size_t j = 0; j < count - i - 1; j++)
+// 		{
+// 			int	cmp_result	= ft_strncmp(symbols[j].name, symbols[j + 1].name, ft_strlen(symbols[j + 1].name) + 1);
+// 			int	cmp_addr	= cmp_addr = symbols[j].address > symbols[j + 1].address;
+			
+// 			// Sort first by name, then by address
+// 			if (data->opt_r && (cmp_result < 0 || (cmp_result == 0 && !cmp_addr)))
+// 			{
+// 				t_symbol temp = symbols[j];
+// 				symbols[j] = symbols[j + 1];
+// 				symbols[j + 1] = temp;
+// 			}
+// 			else if (!data->opt_r && (cmp_result > 0 || (cmp_result == 0 && cmp_addr)))
+// 			{
+// 				t_symbol temp = symbols[j];
+// 				symbols[j] = symbols[j + 1];
+// 				symbols[j + 1] = temp;
+// 			}
+// 		}
+// 	}
+// }
 
 void	print_values(int size, int is_undef, long unsigned int address, char type, char *name)
 {

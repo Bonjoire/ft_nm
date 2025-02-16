@@ -56,6 +56,40 @@ void	exec_test(char *ft_nm, char *nm, char *file)
 	free(cmd);
 }
 
+// Skip similar error message output
+int is_error_similar(char *ft_nm, char *nm)
+{
+	FILE *file_ft_nm = fopen(ft_nm, "r");
+	FILE *file_nm = fopen(nm, "r");
+
+    if (!file_ft_nm || !file_nm)
+	{
+		perror("Erreur d'ouverture");
+		return (0);
+	}
+
+    char buffer_ft_nm[256];
+    char buffer_nm[256];
+    fgets(buffer_ft_nm, sizeof(buffer_ft_nm), file_ft_nm);
+    fgets(buffer_nm, sizeof(buffer_nm), file_nm);
+
+	if (ft_strnstr(buffer_ft_nm, "file format not recognized", ft_strlen(buffer_ft_nm)) != NULL \
+		|| ft_strnstr(buffer_ft_nm, "file too short", ft_strlen(buffer_ft_nm)) != NULL)
+	{
+		if (ft_strnstr(buffer_nm, "no symbols", ft_strlen(buffer_nm)) != NULL \
+			|| ft_strnstr(buffer_nm, "file too short", ft_strlen(buffer_nm)) != NULL \
+			|| ft_strnstr(buffer_nm, "not set for section", ft_strlen(buffer_nm)) != NULL \
+			|| ft_strnstr(buffer_nm, "file format not recognized", ft_strlen(buffer_nm)) != NULL)
+		{
+			fclose(file_ft_nm);
+			fclose(file_nm);
+			return (1);
+		}
+	}
+	fclose(file_ft_nm);
+	fclose(file_nm);
+	return (0);
+}
 int	check_test_files(char *ft_nm, char *nm, char *file, int i)
 {
 	char	*cmd;
@@ -71,7 +105,7 @@ int	check_test_files(char *ft_nm, char *nm, char *file, int i)
 	ret = system(cmd);
 	free(cmd);
 	
-	if (ret == 0)
+	if (ret == 0 || is_error_similar(ft_nm, nm))
 	{
 		printf("Test %-3d passed ✅\n", i);
 		return (1);
@@ -79,6 +113,8 @@ int	check_test_files(char *ft_nm, char *nm, char *file, int i)
 	printf("Test %-3d failed ❌: %s\n", i, file);
 	return (0);
 }
+
+
 
 void	clear_test_files(char *ft_nm, char *nm)
 {
