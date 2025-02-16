@@ -92,7 +92,7 @@ int ft_strcasecmp_nm(const char *s1, const char *s2)
 
 void	sort_symbols(t_data *data, t_symbol *symbols, size_t count)
 {
-	if (data->opt_p)
+	if (data->opt_p || count == 0)
 		return;
 
 	for (size_t i = 0; i < count - 1; i++)
@@ -102,6 +102,9 @@ void	sort_symbols(t_data *data, t_symbol *symbols, size_t count)
 			int cmp_result = ft_strcasecmp_nm(symbols[j].name, symbols[j + 1].name);
 			int cmp_addr = symbols[j].address > symbols[j + 1].address;
 			int cmp_type = symbols[j].type > symbols[j + 1].type;
+			
+			if (data->opt_r)
+				cmp_result = -cmp_result;
 
 			if (cmp_result > 0 || 
 				(cmp_result == 0 && cmp_addr) ||

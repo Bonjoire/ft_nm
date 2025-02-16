@@ -12,11 +12,11 @@
 
 #include "nm.h"
 
-char * opt_g = " ";
-char * opt_u = " ";
-char * opt_r = " ";
-char * opt_p = " ";
-char * opt_valgrind = " ";
+char * opt_g;
+char * opt_u;
+char * opt_r;
+char * opt_p;
+char * opt_valgrind;
 
 void	test(int ac, char **av)
 {
@@ -31,7 +31,6 @@ void	test(int ac, char **av)
 	clear_test_files(ft_nm, nm);
 	for (size_t i = 0; i < tab_len; i++)
 	{
-		// system("sleep 0.2");
 		exec_test(ft_nm, nm, files[i]);
 		if (check_test_files(ft_nm, nm, files[i], i) == 0)
 			continue;
@@ -40,37 +39,33 @@ void	test(int ac, char **av)
 	del_test_files(ft_nm, nm);
 }
 
+
 void parsing_test(int ac, char **av)
 {
 	if (ac != 6)
+		print_help_test();
+
+	char **opt_vars[] = { &opt_g, &opt_u, &opt_r, &opt_p, &opt_valgrind };
+	char *valid_opts[] = { "g", "u", "r", "p", "valgrind" };
+	char *opt_values[] = { "-g ", "-u ", "-r ", "-p ", "valgrind " };
+
+	for (int i = 1; i < 6; i++)
 	{
-		ft_putstr_fd("Usage: ./ft_nm_test g/0 u/0 r/0 p/0 v/0\n", STDERR_FILENO);
-		exit(EXIT_FAILURE);
-	}
-	av++;
-	while(*av)
-	{
-		if (*av[0] == '0' || *av[0] == 'g' || *av[0] == 'u' || *av[0] == 'r' || *av[0] == 'p' || *av[0] == 'v')
-		{
-			if (*av[0] == 'g')
-				opt_g = "-g ";
-			else if (*av[0] == 'u')
-				opt_u = "-u ";
-			else if (*av[0] == 'r')
-				opt_r = "-r ";
-			else if (*av[0] == 'p')
-				opt_p = "-p ";
-			else if (*av[0] == 'v')
-				opt_valgrind = "valgrind ";
-		}
+		if (ft_strncmp(av[i], valid_opts[i - 1], ft_strlen(valid_opts[i - 1]) + 1) != 0 && ft_strncmp(av[i], "0", 2) != 0)
+			print_help_test();
+		if (av[i][0] == '0')
+			*opt_vars[i - 1] = " ";
 		else
-		{
-			ft_putstr_fd("Usage: ./ft_nm_test g/0 u/0 r/0 p/0 v/0\n", STDERR_FILENO);
-			exit(EXIT_FAILURE);
-		}
-		av++;
+			*opt_vars[i - 1] = opt_values[i - 1];
 	}
 }
+
+void	print_help_test(void)
+{
+	ft_putstr_fd("Usage: ./ft_nm_test g/0 u/0 r/0 p/0 v/0\n", STDERR_FILENO);
+	exit(EXIT_FAILURE);
+}
+
 
 void	exec_test(char *ft_nm, char *nm, char *file)
 {
