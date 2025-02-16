@@ -26,6 +26,7 @@ LIBFT_DIR	= ./libft
 LIBFT		= $(LIBFT_DIR)/libft.a
 
 OBJ_DIR		= obj
+OBJ_TEST_DIR = obj_test
 
 SRC			=	srcs/main.c \
 				srcs/test.c \
@@ -57,7 +58,7 @@ all: $(LIBFT) $(OBJ)
 
 bonus: all
 
-test: fclean $(LIBFT) $(OBJ) $(OBJ_TEST)
+test: $(LIBFT) $(OBJ) $(OBJ_TEST)
 	@ echo "$(YELLOW)Compiling ft_nm...$(NC)"
 	@ echo "$(YELLOW)Compiling ft_nm_test...$(NC)"
 	@ $(CXX) $(CFLAGS) ${INCLUDE} -o $(NAME) $(OBJ) -L $(LIBFT_DIR) -lft
@@ -86,7 +87,7 @@ $(OBJ_TEST_DIR)/%.o: %.c
 
 clean:
 	@ echo "$(YELLOW)Cleaning in progress...$(NC)"
-	@ rm -rf $(OBJ) $(OBJ_TEST) obj test
+	@ rm -rf $(OBJ) $(OBJ_TEST) obj obj_test test
 	@ make -sC $(LIBFT_DIR) clean
 	@ echo "$(YELLOW)Cleaning completed$(NC)\n"
 
@@ -96,4 +97,4 @@ fclean: clean
 
 re: fclean all
 
-.PHONY: all clean fclean re test bonus test
+.PHONY: all clean fclean re test bonus

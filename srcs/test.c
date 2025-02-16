@@ -74,7 +74,6 @@ int	check_test_files(char *ft_nm, char *nm, char *file, int i)
 	if (ret == 0)
 	{
 		printf("Test %-3d passed ✅\n", i);
-		nb++;
 		return (1);
 	}
 	printf("Test %-3d failed ❌: %s\n", i, file);
