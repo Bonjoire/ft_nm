@@ -134,19 +134,23 @@ void get_set_symbol_type64(t_data *data, char *symbol_type, uint8_t type, uint8_
 		*symbol_type = (bind == STB_LOCAL) ? 'a' : 'A';
 	if (symbol_index == SHN_COMMON)		// Common symbol
 		*symbol_type = (bind == STB_LOCAL) ? 'c' : 'C';
-	if (symbol_index == SHN_UNDEF || symbol_index == SHN_ABS || symbol_index == SHN_COMMON)
+	if (!(data->opt_g && bind == STB_LOCAL) && (symbol_index == SHN_UNDEF || symbol_index == SHN_ABS || symbol_index == SHN_COMMON))
 		return;
 
 	if (bind == STB_WEAK) {
 		if (type == STT_OBJECT)
 			*symbol_type = (bind == STB_LOCAL) ? 'v' : 'V'; // Weak object
 		else
-			*symbol_type = (bind == STB_LOCAL) ? 'w' : 'W'; // Weak function
+		{
+			*symbol_type = (bind == STB_LOCAL) ? 'w' : 'W';	// Weak function
+			if (data->opt_g && bind == STB_LOCAL)
+				*symbol_type = 'w';							// Weak function
+		}
 		return;
 	}
 
 	// Option -g show only global symbols
-	if (data->opt_g && bind != STB_GLOBAL)
+	if (data->opt_g && bind == STB_LOCAL)
 	{
 		*symbol_type = '0';
 		return;
@@ -168,6 +172,7 @@ void get_set_symbol_type64(t_data *data, char *symbol_type, uint8_t type, uint8_
 		*symbol_type = '?';								// Unknown or unsupported section
 }
 
+
 void get_set_symbol_type32(t_data *data, char *symbol_type, uint8_t type, uint8_t bind, uint16_t symbol_index, Elf32_Shdr *section_header)
 {
 	if (symbol_index == SHN_UNDEF)		// Weak or Undefined symbol
@@ -176,19 +181,23 @@ void get_set_symbol_type32(t_data *data, char *symbol_type, uint8_t type, uint8_
 		*symbol_type = (bind == STB_LOCAL) ? 'a' : 'A';
 	if (symbol_index == SHN_COMMON)		// Common symbol
 		*symbol_type = (bind == STB_LOCAL) ? 'c' : 'C';
-	if (symbol_index == SHN_UNDEF || symbol_index == SHN_ABS || symbol_index == SHN_COMMON)
+	if (!(data->opt_g && bind == STB_LOCAL) && (symbol_index == SHN_UNDEF || symbol_index == SHN_ABS || symbol_index == SHN_COMMON))
 		return;
 
 	if (bind == STB_WEAK) {
 		if (type == STT_OBJECT)
 			*symbol_type = (bind == STB_LOCAL) ? 'v' : 'V'; // Weak object
 		else
-			*symbol_type = (bind == STB_LOCAL) ? 'w' : 'W'; // Weak function
+		{
+			*symbol_type = (bind == STB_LOCAL) ? 'w' : 'W';	// Weak function
+			if (data->opt_g && bind == STB_LOCAL)
+				*symbol_type = 'w';							// Weak function
+		}
 		return;
 	}
 
 	// Option -g show only global symbols
-	if (data->opt_g && bind != STB_GLOBAL)
+	if (data->opt_g && bind == STB_LOCAL)
 	{
 		*symbol_type = '0';
 		return;
