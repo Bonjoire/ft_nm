@@ -58,7 +58,7 @@ Si la lettre est en minuscule, le symbole est généralement local ; si elle est
 
 ## 📚 Structure d'un fichier ELF
 
-![Structure elf](readme_img/img1.png)
+![Structure elf](img/img1.png)
 
 - **Header ELF** : Contient des informations sur le fichier. Permet d'acceder à la table des sections avec `e_shoff`.
 - **Section Table** : Contient les données des section. Permet d'acceder à la table des symbole avec `sh_offset`.
