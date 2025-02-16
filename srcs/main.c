@@ -15,7 +15,7 @@
 int	main(int ac, char **av)
 {
 	if (TEST_MODE)
-		test();
+		test(ac, av);
 	else
 		nm(ac, av);
 

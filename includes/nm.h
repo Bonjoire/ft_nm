@@ -100,7 +100,8 @@ void	print_values(int size, int is_undef, long unsigned int address, char type, 
 int		ft_strcasecmp_nm(const char *s1, const char *s2);
 
 // test.c
-void	test();
+void	test(int ac, char **av);
+void	parsing_test(int ac, char **av);
 char**	get_files(char *path);
 void	exec_test(char *ft_nm, char *nm, char *file);
 int		check_test_files(char *ft_nm, char *nm, char *file, int i);

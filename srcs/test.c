@@ -12,17 +12,26 @@
 
 #include "nm.h"
 
-void	test()
+char * opt_g = " ";
+char * opt_u = " ";
+char * opt_r = " ";
+char * opt_p = " ";
+char * opt_valgrind = " ";
+
+void	test(int ac, char **av)
 {
+	parsing_test(ac, av);
+
 	char	*nm		= TEST_OUTPUT_NM;
 	char	*ft_nm	= TEST_OUTPUT_FT_NM;
 	char	**files	= get_files(TEST_FILES_PATH);
 	size_t	tab_len	= ft_tab_len(files);
 
+
 	clear_test_files(ft_nm, nm);
 	for (size_t i = 0; i < tab_len; i++)
 	{
-		system("sleep 0.2");
+		// system("sleep 0.2");
 		exec_test(ft_nm, nm, files[i]);
 		if (check_test_files(ft_nm, nm, files[i], i) == 0)
 			continue;
@@ -31,11 +40,43 @@ void	test()
 	del_test_files(ft_nm, nm);
 }
 
+void parsing_test(int ac, char **av)
+{
+	if (ac != 6)
+	{
+		ft_putstr_fd("Usage: ./ft_nm_test g/0 u/0 r/0 p/0 v/0\n", STDERR_FILENO);
+		exit(EXIT_FAILURE);
+	}
+	av++;
+	while(*av)
+	{
+		if (*av[0] == '0' || *av[0] == 'g' || *av[0] == 'u' || *av[0] == 'r' || *av[0] == 'p' || *av[0] == 'v')
+		{
+			if (*av[0] == 'g')
+				opt_g = "-g ";
+			else if (*av[0] == 'u')
+				opt_u = "-u ";
+			else if (*av[0] == 'r')
+				opt_r = "-r ";
+			else if (*av[0] == 'p')
+				opt_p = "-p ";
+			else if (*av[0] == 'v')
+				opt_valgrind = "valgrind ";
+		}
+		else
+		{
+			ft_putstr_fd("Usage: ./ft_nm_test g/0 u/0 r/0 p/0 v/0\n", STDERR_FILENO);
+			exit(EXIT_FAILURE);
+		}
+		av++;
+	}
+}
+
 void	exec_test(char *ft_nm, char *nm, char *file)
 {
 	char	*cmd;
-	char	*ft_nm_cmd_part[]	= {"nm ", file, " > ", nm, " 2>&1", NULL};
-	char	*nm_cmd_part[]		= {"./ft_nm ", file, " > ", ft_nm, " 2>&1", NULL};
+	char	*ft_nm_cmd_part[]	= {"nm ", opt_g, opt_u, opt_r ,opt_p, file, " > ", nm, " 2>&1", NULL};
+	char	*nm_cmd_part[]		= {opt_valgrind, "./ft_nm ", opt_g, opt_u, opt_r ,opt_p, file, " > ", ft_nm, " 2>&1", NULL};
 	
 	cmd = ft_strtab_to_str(ft_nm_cmd_part);
 	if (!cmd)
@@ -107,7 +148,7 @@ int	check_test_files(char *ft_nm, char *nm, char *file, int i)
 	
 	if (ret == 0 || is_error_similar(ft_nm, nm))
 	{
-		printf("Test %-3d passed ✅\n", i);
+		printf("Test %-3d passed ✅ : %s\n", i, file);
 		return (1);
 	}
 	printf("Test %-3d failed ❌: %s\n", i, file);
