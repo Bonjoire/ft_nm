@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parse_elf.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+        */
+/*   By: hubourge <hubourge@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 17:10:51 by hubourge          #+#    #+#             */
-/*   Updated: 2025/02/10 18:45:42 by hubourge         ###   ########.fr       */
+/*   Updated: 2025/02/19 18:20:37 by hubourge         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,20 @@ void	detect_valid_elf(t_data *data, void *mapped_file)
 		free_all_exit(*data, EXIT_FAILURE);
 	}
 
+	// Check for valid endianness
+	if (e_ident[EI_DATA] != ELFDATA2LSB && e_ident[EI_DATA] != ELFDATA2MSB)
+	{
+		ft_printf(STDERR_FILENO, "nm: %s: file format not recognized\n", data->file);
+		free_all_exit(*data, EXIT_FAILURE);
+	}
+
+	// Check for valid version
+	if (e_ident[EI_VERSION] != EV_CURRENT)
+	{
+		ft_printf(STDERR_FILENO, "nm: %s: file format not recognized\n", data->file);
+		free_all_exit(*data, EXIT_FAILURE);
+	}
+
 	// Detect 32 or 64 bits ELF file
 	if (e_ident[EI_CLASS] == ELFCLASS64)
 		handle64(data);
@@ -108,7 +122,7 @@ void	handle64(t_data *data)
 		parse_symbols64(data, symtab_section, strtab_section, section_header);
 	else
 	{
-		ft_printf(STDERR_FILENO, "nm: %s: file format not recognized\n", data->file);
+		ft_printf(STDERR_FILENO, "nm: %s: no symbols\n", data->file);
 		free_all_exit(*data, EXIT_FAILURE);
 	}
 }
@@ -126,6 +140,10 @@ void	check_error64(t_data *data, Elf64_Ehdr *header, uint16_t nb_sections, Elf64
 	}
 	else
 	{
+		if ((size_t)header->e_shoff > (size_t)data->statbuf.st_size)
+		{
+			ft_printf(STDERR_FILENO, "bfd plugin: %s: file too short\n", data->file);
+		}
 		// Check if the file is too small
 		if ((size_t)data->statbuf.st_size < sizeof(Elf64_Ehdr))
 		{
@@ -135,7 +153,6 @@ void	check_error64(t_data *data, Elf64_Ehdr *header, uint16_t nb_sections, Elf64
 		// Check if the section header table is within the file
 		if ((size_t)header->e_shnum * sizeof(Elf64_Shdr) + (size_t)header->e_shoff > (size_t)data->statbuf.st_size)
 		{
-			// ft_printf(STDERR_FILENO, "bfd plugin: %s: file too short\n", data->file);
 			ft_printf(STDERR_FILENO, "nm: %s: file format not recognized\n", data->file);
 			free_all_exit(*data, EXIT_FAILURE);
 		}
@@ -190,7 +207,7 @@ void	handle32(t_data *data)
 		parse_symbols32(data, symtab_section, strtab_section, section_header);
 	else
 	{
-		ft_printf(STDERR_FILENO, "nm: %s: file format not recognized\n", data->file);
+		ft_printf(STDERR_FILENO, "nm: %s: no symbols\n", data->file);
 		free_all_exit(*data, EXIT_FAILURE);
 	}
 }
@@ -207,7 +224,11 @@ void	check_error32(t_data *data, Elf32_Ehdr *header, uint16_t nb_sections, Elf32
 		}
 	}
 	else
-	{
+	{ 
+		if ((size_t)header->e_shoff > (size_t)data->statbuf.st_size)
+		{
+			ft_printf(STDERR_FILENO, "bfd plugin: %s: file too short\n", data->file);
+		}
 		// Check if the file is too small
 		if ((size_t)data->statbuf.st_size < sizeof(Elf32_Ehdr))
 		{
@@ -217,7 +238,6 @@ void	check_error32(t_data *data, Elf32_Ehdr *header, uint16_t nb_sections, Elf32
 		// Check if the section header table is within the file
 		if ((size_t)header->e_shnum * sizeof(Elf32_Shdr) + (size_t)header->e_shoff > (size_t)data->statbuf.st_size)
 		{
-			ft_printf(STDERR_FILENO, "bfd plugin: %s: file too short\n", data->file);
 			ft_printf(STDERR_FILENO, "nm: %s: file format not recognized\n", data->file);
 			free_all_exit(*data, EXIT_FAILURE);
 		}
