@@ -6,7 +6,7 @@
 /*   By: hubourge <hubourge@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/03 17:51:45 by hubourge          #+#    #+#             */
-/*   Updated: 2025/02/19 18:45:05 by hubourge         ###   ########.fr       */
+/*   Updated: 2025/02/19 19:00:59 by hubourge         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,7 +111,7 @@ int	check_test_files(char *ft_nm, char *nm, char *file, int i)
 	total_tests++;
 	if (ret == 0)
 	{
-		// printf("Test %-3d passed ✅ : %s\n", i, file);
+		printf("Test %-3d passed ✅ : %s\n", i, file);
 		passed_tests++;
 		return (1);
 	}
