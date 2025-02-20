@@ -6,7 +6,7 @@
 /*   By: hubourge <hubourge@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 14:34:34 by hubourge          #+#    #+#             */
-/*   Updated: 2025/02/19 19:12:37 by hubourge         ###   ########.fr       */
+/*   Updated: 2025/02/20 20:42:42 by hubourge         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,8 +37,10 @@ void	nm(int ac, char **av)
 			init_data(&data, DO_NOT_INIT_OPT);
 			data.file = av[i];
 			if (data.nb_files == 0)
+			{
 				data.file = "a.out";
-			data.nb_files++;
+				data.nb_files++;
+			}
 
 			if (!file_rights(&data, data.file))
 			{
@@ -48,7 +50,11 @@ void	nm(int ac, char **av)
 			if (data.nb_files > 1)
 				ft_printf(STDOUT_FILENO, "\n%s:\n", av[i]);
 			
-			map_file(&data);
+			if (map_file(&data) == NULL)
+			{
+				i++;
+				continue;
+			}
 			detect_valid_elf(&data, data.mapped_file);
 			free_all_exit(data, DO_NOT_EXIT);
 		}

@@ -6,7 +6,7 @@
 /*   By: hubourge <hubourge@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/03 17:51:45 by hubourge          #+#    #+#             */
-/*   Updated: 2025/02/19 19:00:59 by hubourge         ###   ########.fr       */
+/*   Updated: 2025/02/20 20:50:45 by hubourge         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,6 @@ void	test(int ac, char **av)
 	char	**files	= get_files(TEST_FILES_PATH);
 	size_t	tab_len	= ft_tab_len(files);
 
-
 	clear_test_files(ft_nm, nm);
 	for (size_t i = 0; i < tab_len; i++)
 	{
@@ -42,7 +41,7 @@ void	test(int ac, char **av)
 	printf("%d/%d tests passed\n", passed_tests, total_tests);
 }
 
-void parsing_test(int ac, char **av)
+void	parsing_test(int ac, char **av)
 {
 	if (ac != 6)
 		print_help_test();

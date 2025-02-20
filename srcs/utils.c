@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+        */
+/*   By: hubourge <hubourge@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 14:34:27 by hubourge          #+#    #+#             */
-/*   Updated: 2025/02/10 23:15:05 by hubourge         ###   ########.fr       */
+/*   Updated: 2025/02/20 20:50:52 by hubourge         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ void	free_all_exit(t_data data, int exit_status)
 		munmap(data.mapped_file, data.statbuf.st_size);
 	if (data.fd != -1)
 		close(data.fd);
-	if (exit_status == EXIT_FAILURE)
+	if (exit_status == EXIT_FAILURE || exit_status == EXIT_SUCCESS)
 		exit(EXIT_FAILURE);
 }
 
@@ -57,7 +57,6 @@ void	print_values(int size, int is_undef, long unsigned int address, char type, 
 		ft_printf(STDOUT_FILENO, " %c %s\n",  type, name);
 	}
 }
-
 
 int	ft_strcasecmp_nm(const char *s1, const char *s2)
 {

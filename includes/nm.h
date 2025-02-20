@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   nm.h                                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+        */
+/*   By: hubourge <hubourge@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 14:34:54 by hubourge          #+#    #+#             */
-/*   Updated: 2025/02/10 23:16:45 by hubourge         ###   ########.fr       */
+/*   Updated: 2025/02/20 20:56:37 by hubourge         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@
 # include <dirent.h> // test part
 
 # define DO_NOT_INIT_OPT 		0
-# define DO_NOT_EXIT			0
+# define DO_NOT_EXIT			-1
 # define DO_INIT_OPT			1
 # define NOT_UNDEF				0
 # define UNDEF 					1
@@ -76,8 +76,8 @@ void	*map_file(t_data *data);
 void	detect_valid_elf(t_data *data, void *mapped_file);
 void	handle64(t_data *data);
 void	handle32(t_data *data);
-void	check_error64(t_data *data, Elf64_Ehdr *header, uint16_t nb_sections, Elf64_Shdr *section_tab_header);
-void	check_error32(t_data *data, Elf32_Ehdr *header, uint16_t nb_sections, Elf32_Shdr *section_tab_header);
+int		check_error64(t_data *data, Elf64_Ehdr *header, uint16_t nb_sections, Elf64_Shdr *section_tab_header);
+int		check_error32(t_data *data, Elf32_Ehdr *header, uint16_t nb_sections, Elf32_Shdr *section_tab_header);
 
 // parse_symbol.c
 void	parse_symbols64(t_data *data, Elf64_Shdr *symtab_section, Elf64_Shdr *strtab_section, Elf64_Shdr *section_header);

@@ -6,7 +6,7 @@
 /*   By: hubourge <hubourge@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 17:10:51 by hubourge          #+#    #+#             */
-/*   Updated: 2025/02/19 18:20:37 by hubourge         ###   ########.fr       */
+/*   Updated: 2025/02/20 20:49:22 by hubourge         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,10 @@ int	file_rights(t_data *data, char *file)
 	data->fd = open(file, O_RDONLY);
 	if (data->fd < 0)
 	{
-		fprintf(stderr, "nm: %s: Permission denied\n", file);
+		if (errno == EACCES)
+			fprintf(stderr, "nm: %s: Permission denied\n", file);
+		else if (errno == ENOENT)
+			fprintf(stderr, "nm: '%s': No such file\n", file);
 		return (0);
 	}
 	if (fstat(data->fd, &(data)->statbuf) < 0)
@@ -36,7 +39,10 @@ int	file_rights(t_data *data, char *file)
 void	*map_file(t_data *data)
 {
 	if (data->statbuf.st_size == 0)
-		free_all_exit(*data, EXIT_FAILURE);
+	{
+		free_all_exit(*data, -1);
+		return (NULL);
+	}
 	data->mapped_file = mmap(NULL, data->statbuf.st_size, PROT_READ, MAP_PRIVATE, data->fd, 0);
 	if (data->mapped_file == MAP_FAILED)
 	{
@@ -50,7 +56,7 @@ void	*map_file(t_data *data)
 
 void	detect_valid_elf(t_data *data, void *mapped_file)
 {
-	// Check if the file is an ELF file
+	// magic number
 	unsigned char *e_ident = (unsigned char *)mapped_file;
 	if (e_ident[EI_MAG0] != ELFMAG0 ||
 		e_ident[EI_MAG1] != ELFMAG1 ||
@@ -58,24 +64,24 @@ void	detect_valid_elf(t_data *data, void *mapped_file)
 		e_ident[EI_MAG3] != ELFMAG3)
 	{
 		ft_printf(STDERR_FILENO, "nm: %s: file format not recognized\n", data->file);
-		free_all_exit(*data, EXIT_FAILURE);
+		free_all_exit(*data, DO_NOT_EXIT);
+		return ;
 	}
-
-	// Check for valid endianness
+	// valid endianness
 	if (e_ident[EI_DATA] != ELFDATA2LSB && e_ident[EI_DATA] != ELFDATA2MSB)
 	{
 		ft_printf(STDERR_FILENO, "nm: %s: file format not recognized\n", data->file);
-		free_all_exit(*data, EXIT_FAILURE);
+		free_all_exit(*data, DO_NOT_EXIT);
+		return ;
 	}
-
-	// Check for valid version
+	// valid version
 	if (e_ident[EI_VERSION] != EV_CURRENT)
 	{
 		ft_printf(STDERR_FILENO, "nm: %s: file format not recognized\n", data->file);
-		free_all_exit(*data, EXIT_FAILURE);
+		free_all_exit(*data, DO_NOT_EXIT);
+		return ;
 	}
-
-	// Detect 32 or 64 bits ELF file
+	// 32 or 64 bits ELF file
 	if (e_ident[EI_CLASS] == ELFCLASS64)
 		handle64(data);
 	else if(e_ident[EI_CLASS] == ELFCLASS32)
@@ -83,7 +89,7 @@ void	detect_valid_elf(t_data *data, void *mapped_file)
 	else
 	{
 		ft_printf(STDERR_FILENO, "nm: %s: file format not recognized\n", data->file);
-		free_all_exit(*data, EXIT_FAILURE);
+		free_all_exit(*data, DO_NOT_EXIT);
 	}
 }
 
@@ -96,9 +102,11 @@ void	handle64(t_data *data)
 	Elf64_Shdr		*section_tab_header	= NULL;
 	data->header64						= header;
 
-	check_error64(data, header, nb_sections, NULL);
+	if (!check_error64(data, header, nb_sections, NULL))
+		return ;
 	section_tab_header			= &section_header[header->e_shstrndx];
-	check_error64(data, header, nb_sections, section_tab_header);
+	if (!check_error64(data, header, nb_sections, section_tab_header))
+		return ;
 	const char	*section_tab	= (const char *)data->mapped_file + section_tab_header->sh_offset;
 
 	// Parse sections symbols;
@@ -123,23 +131,25 @@ void	handle64(t_data *data)
 	else
 	{
 		ft_printf(STDERR_FILENO, "nm: %s: no symbols\n", data->file);
-		free_all_exit(*data, EXIT_FAILURE);
+		free_all_exit(*data, DO_NOT_EXIT);
 	}
 }
 
-void	check_error64(t_data *data, Elf64_Ehdr *header, uint16_t nb_sections, Elf64_Shdr *section_tab_header)
+int	check_error64(t_data *data, Elf64_Ehdr *header, uint16_t nb_sections, Elf64_Shdr *section_tab_header)
 {
 	if (section_tab_header)
 	{
-		// Check valide section header size
+		// Valid section header size
 		if (section_tab_header->sh_offset + section_tab_header->sh_size > (size_t)data->statbuf.st_size)
 		{
 			ft_printf(STDERR_FILENO, "nm: %s: file format not recognized\n", data->file);
-			free_all_exit(*data, EXIT_FAILURE);
+			free_all_exit(*data, DO_NOT_EXIT);
+			return (0);
 		}
 	}
 	else
 	{
+		// Valid file size
 		if ((size_t)header->e_shoff > (size_t)data->statbuf.st_size)
 		{
 			ft_printf(STDERR_FILENO, "bfd plugin: %s: file too short\n", data->file);
@@ -147,29 +157,34 @@ void	check_error64(t_data *data, Elf64_Ehdr *header, uint16_t nb_sections, Elf64
 		// Check if the file is too small
 		if ((size_t)data->statbuf.st_size < sizeof(Elf64_Ehdr))
 		{
-			ft_printf(STDERR_FILENO, "nm: %s: file format not recognized\n", data->file);
-			free_all_exit(*data, EXIT_FAILURE);
+			ft_printf(STDERR_FILENO, "nm: %s: file too short\n", data->file);
+			free_all_exit(*data, DO_NOT_EXIT);
+			return (0);
 		}
 		// Check if the section header table is within the file
 		if ((size_t)header->e_shnum * sizeof(Elf64_Shdr) + (size_t)header->e_shoff > (size_t)data->statbuf.st_size)
 		{
 			ft_printf(STDERR_FILENO, "nm: %s: file format not recognized\n", data->file);
-			free_all_exit(*data, EXIT_FAILURE);
+			free_all_exit(*data, DO_NOT_EXIT);
+			return (0);
 		}
 		// Check if the program header table is within the file
 		if ((size_t)header->e_phoff >= (size_t)data->statbuf.st_size || 
 			(size_t)header->e_shoff >= (size_t)data->statbuf.st_size)
 		{
 			ft_printf(STDERR_FILENO, "nm: %s: file format not recognized\n", data->file);
-			free_all_exit(*data, EXIT_FAILURE);
+			free_all_exit(*data, DO_NOT_EXIT);
+			return (0);
 		}
 		// Check if the section header string table index is valid
 		if (header->e_shstrndx >= nb_sections)
 		{	
 			ft_printf(STDERR_FILENO, "nm: %s: file format not recognized\n", data->file);
-			free_all_exit(*data, EXIT_FAILURE);
+			free_all_exit(*data, DO_NOT_EXIT);
+			return (0);
 		}
 	}
+	return (1);
 }
 
 void	handle32(t_data *data)
@@ -181,9 +196,11 @@ void	handle32(t_data *data)
 	Elf32_Shdr		*section_tab_header	= NULL;
 	data->header32						= header;
 
-	check_error32(data, header, nb_sections, NULL);
+	if (!check_error32(data, header, nb_sections, NULL))
+		return ;
 	section_tab_header			= &section_header[header->e_shstrndx];
-	check_error32(data, header, nb_sections, section_tab_header);
+	if (!check_error32(data, header, nb_sections, section_tab_header))
+		return ;
 	const char	*section_tab	= (const char *)data->mapped_file + section_tab_header->sh_offset;
 
 	// Parse sections symbols;
@@ -208,23 +225,25 @@ void	handle32(t_data *data)
 	else
 	{
 		ft_printf(STDERR_FILENO, "nm: %s: no symbols\n", data->file);
-		free_all_exit(*data, EXIT_FAILURE);
+		free_all_exit(*data, DO_NOT_EXIT);
 	}
 }
 
-void	check_error32(t_data *data, Elf32_Ehdr *header, uint16_t nb_sections, Elf32_Shdr *section_tab_header)
+int	check_error32(t_data *data, Elf32_Ehdr *header, uint16_t nb_sections, Elf32_Shdr *section_tab_header)
 {
 	if (section_tab_header)
 	{
-		// Check valide section header size
+		// Valid section header size
 		if (section_tab_header->sh_offset + section_tab_header->sh_size > (size_t)data->statbuf.st_size)
 		{
 			ft_printf(STDERR_FILENO, "nm: %s: file format not recognized\n", data->file);
-			free_all_exit(*data, EXIT_FAILURE);
+			free_all_exit(*data, DO_NOT_EXIT);
+			return (0);
 		}
 	}
 	else
-	{ 
+	{
+		// Valid file size
 		if ((size_t)header->e_shoff > (size_t)data->statbuf.st_size)
 		{
 			ft_printf(STDERR_FILENO, "bfd plugin: %s: file too short\n", data->file);
@@ -232,27 +251,32 @@ void	check_error32(t_data *data, Elf32_Ehdr *header, uint16_t nb_sections, Elf32
 		// Check if the file is too small
 		if ((size_t)data->statbuf.st_size < sizeof(Elf32_Ehdr))
 		{
-			ft_printf(STDERR_FILENO, "nm: %s: file format not recognized\n", data->file);
-			free_all_exit(*data, EXIT_FAILURE);
+			ft_printf(STDERR_FILENO, "nm: %s: file too short\n", data->file);
+			free_all_exit(*data, DO_NOT_EXIT);
+			return (0);
 		}
 		// Check if the section header table is within the file
 		if ((size_t)header->e_shnum * sizeof(Elf32_Shdr) + (size_t)header->e_shoff > (size_t)data->statbuf.st_size)
 		{
 			ft_printf(STDERR_FILENO, "nm: %s: file format not recognized\n", data->file);
-			free_all_exit(*data, EXIT_FAILURE);
+			free_all_exit(*data, DO_NOT_EXIT);
+			return (0);
 		}
 		// Check if the program header table is within the file
 		if ((size_t)header->e_phoff >= (size_t)data->statbuf.st_size || 
 			(size_t)header->e_shoff >= (size_t)data->statbuf.st_size)
 		{
 			ft_printf(STDERR_FILENO, "nm: %s: file format not recognized\n", data->file);
-			free_all_exit(*data, EXIT_FAILURE);
+			free_all_exit(*data, DO_NOT_EXIT);
+			return (0);
 		}
 		// Check if the section header string table index is valid
 		if (header->e_shstrndx >= nb_sections)
 		{	
 			ft_printf(STDERR_FILENO, "nm: %s: file format not recognized\n", data->file);
-			free_all_exit(*data, EXIT_FAILURE);
+			free_all_exit(*data, DO_NOT_EXIT);
+			return (0);
 		}
 	}
+	return (1);
 }
